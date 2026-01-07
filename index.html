@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<htindex.html:linear-gradient(90deg,#0b1d3a,#123a6f);
+  color:white;
+  padding:15px 25px;
+  width:900px;
+  border-radius:12px;
+}
+.title{
+  font-size:26px;
+  font-weight:bold;
+}
+.score{
+  font-size:48px;
+  font-weight:bold;
+}
+.row{
+  font-size:20px;
+  margin-top:4px;
+}
+</style>
+</head>
+
+<body>
+<div id="board">
+  <div class="title" id="title">Loading...</div>
+  <div class="score" id="score">--</div>
+  <div class="row" id="teams">-- vs --</div>
+  <div class="row" id="overs">Overs: --</div>
+  <div class="row" id="batsman">Bat: --</div>
+  <div class="row" id="bowler">Bowl: --</div>
+</div>
+<script>
+const SHEET_ID = "1ie9iJlzF9Z836RHNNOuS2Y1jUK5JBmO_78ZmScKR0XY";
+const SHEET_NAME = "Sheet1";
+const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+
+async function loadData(){
+  const res = await fetch(URL);
+  const data = await res.json();
+
+  document.getElementById("title").innerText = data[0]["Village Cricket Live"];
+  document.getElementById("teams").innerText =
+    data[1]["TEAM A"] + " vs " + data[2]["TEAM B"];
+  document.getElementById("score").innerText = data[3]["125/5"];
+  document.getElementById("overs").innerText = "Overs: " + data[4]["15.2"];
+  document.getElementById("batsman").innerText = "Bat: " + data[5]["Rohit 45(32)"];
+  document.getElementById("bowler").innerText = "Bowl: " + data[6]["Starc 2-0-18-1"];
+}
+
+loadData();
+setInterval(loadData,3000);
+</script>
+</body>
+</html>
