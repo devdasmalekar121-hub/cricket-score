@@ -15,17 +15,20 @@
         
         .team-box { width: 130px; background: #fec309; color: #00122e; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; text-transform: uppercase; }
         .score-box { width: 200px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; background: #00122e; }
-        .bats-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-around; font-size: 17px; background: rgba(0,0,0,0.3); border-left: 1px solid rgba(255,255,255,0.1); padding-right: 150px; }
+        .bats-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-around; font-size: 17px; background: rgba(0,0,0,0.3); border-left: 1px solid rgba(255,255,255,0.1); padding-right: 165px; }
         
-        /* OPPONENT SCORE BOX (Top Right) */
+        /* OPPONENT SCORE BOX */
         .opp-score-box { position: absolute; right: 0; top: 0; height: 100%; width: 160px; background: #d9534f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 3px solid white; border-top-right-radius: 8px; }
         .opp-name { font-size: 12px; font-weight: bold; opacity: 0.9; }
         .opp-val { font-size: 18px; font-weight: 900; }
 
         .bottom-bar { height: 40px; background: rgba(0,0,0,0.95); display: flex; align-items: center; padding: 0 15px; font-size: 14px; color: #fec309; border-radius: 0 0 8px 8px; }
         
-        .dots { margin-left: auto; display: flex; gap: 8px; }
-        .dot { width: 25px; height: 25px; border-radius: 50%; background: #333; border: 1px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        /* BOWLER & DOTS SECTION */
+        .bowling-status { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+        .bowler-name-disp { color: white; font-weight: bold; font-size: 13px; text-transform: uppercase; border-right: 1px solid #555; padding-right: 10px; }
+        .dots { display: flex; gap: 8px; }
+        .dot { width: 25px; height: 25px; border-radius: 50%; background: #333; border: 1px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; }
         .dot-active { background: #fec309; color: black; border-color: #fff; }
         .dot-w { background: white; color: red; font-weight: bold; }
         .active-s { color: #fec309; font-weight: bold; }
@@ -64,16 +67,19 @@
         </div>
         <div class="bottom-bar">
             <span id="d-tour">TOURNAMENT</span> &nbsp;|&nbsp; <span id="d-status">1ST INNINGS | CRR: 0.00</span>
-            <div class="dots" id="dots-wrap">
-                <div class="dot">1</div><div class="dot">2</div><div class="dot">3</div>
-                <div class="dot">4</div><div class="dot">5</div><div class="dot">6</div>
+            <div class="bowling-status">
+                <div class="bowler-name-disp" id="d-bowl">BOWLER</div>
+                <div class="dots" id="dots-wrap">
+                    <div class="dot">1</div><div class="dot">2</div><div class="dot">3</div>
+                    <div class="dot">4</div><div class="dot">5</div><div class="dot">6</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="admin-panel">
         <div class="group">
-            <h3>LIVE TEAM CONTROLS (Batting Now)</h3>
+            <h3>LIVE SCORE CONTROLS</h3>
             <div class="btn-grid">
                 <button onclick="add('runs',1)">+1 Run</button>
                 <button onclick="add('runs',4)">+4</button>
@@ -88,110 +94,9 @@
         </div>
 
         <div class="group">
-            <h3>OPPONENT TEAM RESULT (Already Played)</h3>
-            <div class="input-grid">
-                <input type="text" id="i-opp-name" placeholder="Opponent Name (e.g. AUS)" oninput="upd()">
-                <input type="text" id="i-opp-score" placeholder="Score (e.g. 150-5)" oninput="upd()">
-                <input type="text" id="i-opp-over" placeholder="Overs (e.g. 20.0)" oninput="upd()">
-            </div>
-            <div class="btn-grid" style="margin-top:10px;">
-                <button onclick="modOpp('r',1)">+1 Run</button>
-                <button onclick="modOpp('r',-1)">-1 Run</button>
-                <button onclick="modOpp('w',1)">+1 Wkt</button>
-                <button onclick="modOpp('w',-1)">-1 Wkt</button>
-            </div>
-        </div>
-
-        <div class="group">
-            <h3>NAMES & SETTINGS</h3>
+            <h3>NAMES & BOWLER</h3>
             <div class="input-grid">
                 <input type="text" id="i-team" placeholder="Live Team Name" oninput="upd()">
-                <input type="text" id="i-b1" placeholder="Batsman 1" oninput="upd()">
-                <button onclick="setS(1)">Striker 1</button>
-                <input type="text" id="i-tour" placeholder="Tournament" oninput="upd()">
-                <input type="text" id="i-b2" placeholder="Batsman 2" oninput="upd()">
-                <button onclick="setS(2)">Striker 2</button>
-            </div>
-        </div>
-        <button class="btn-yel" style="width:100%; padding:15px;" onclick="changeInn()">TOGGLE INNINGS</button>
-    </div>
-
-    <script>
-        let st = { runs:0, wkt:0, b:0, ov:0, b1r:0, b1b:0, b2r:0, b2b:0, s:1, inn:1, curBall:0, or:0, ow:0 };
-
-        function upd() {
-            document.getElementById('d-tour').innerText = document.getElementById('i-tour').value || "TOURNAMENT";
-            document.getElementById('d-team').innerText = document.getElementById('i-team').value || "TEAM 1";
-            document.getElementById('d-b1').innerText = document.getElementById('i-b1').value || "B1";
-            document.getElementById('d-b2').innerText = document.getElementById('i-b2').value || "B2";
-            document.getElementById('d-opp-name').innerText = document.getElementById('i-opp-name').value || "OPPONENT";
-            updateOppDisp();
-        }
-
-        function modOpp(type, v) {
-            if(type==='r') st.or += v;
-            if(type==='w') st.ow += v;
-            updateOppDisp();
-        }
-
-        function updateOppDisp() {
-            let ov = document.getElementById('i-opp-over').value || "0.0";
-            let scoreStr = document.getElementById('i-opp-score').value;
-            if(!scoreStr) {
-                document.getElementById('d-opp-score').innerText = st.or + "-" + st.ow + " (" + ov + ")";
-            } else {
-                document.getElementById('d-opp-score').innerText = scoreStr + " (" + ov + ")";
-            }
-        }
-
-        function add(type, v) {
-            st[type] += v;
-            if(type==='runs') { if(st.s===1) st.b1r += v; else st.b2r += v; }
-            refresh();
-        }
-
-        function nextBall() {
-            if(st.curBall < 6) {
-                st.curBall++; st.b++;
-                if(st.b >= 6) { st.ov++; st.b = 0; }
-                if(st.s===1) st.b1b++; else st.b2b++;
-                document.querySelectorAll('.dot')[st.curBall-1].classList.add('dot-active');
-            }
-            refresh();
-        }
-
-        function addWicket() {
-            if(st.curBall < 6) {
-                st.wkt++; st.curBall++; st.b++;
-                if(st.b >= 6) { st.ov++; st.b = 0; }
-                let d = document.querySelectorAll('.dot')[st.curBall-1];
-                d.classList.add('dot-w'); d.innerText = "W";
-            }
-            refresh();
-        }
-
-        function resetOver() {
-            st.curBall = 0;
-            document.querySelectorAll('.dot').forEach((d, i) => {
-                d.classList.remove('dot-active', 'dot-w');
-                d.innerText = i + 1;
-            });
-        }
-
-        function setS(n) { st.s = n; refresh(); }
-        function changeInn() { st.inn = st.inn === 1 ? 2 : 1; refresh(); }
-
-        function refresh() {
-            document.getElementById('d-runs').innerText = st.runs;
-            document.getElementById('d-wkt').innerText = st.wkt;
-            document.getElementById('d-ov').innerText = st.ov + "." + st.b;
-            document.getElementById('d-b1r').innerText = st.b1r; document.getElementById('d-b1b').innerText = st.b1b;
-            document.getElementById('d-b2r').innerText = st.b2r; document.getElementById('d-b2b').innerText = st.b2b;
-            document.getElementById('d-b1s').innerText = st.s===1 ? "*" : "";
-            document.getElementById('d-b2s').innerText = st.s===2 ? "*" : "";
-            let crr = (st.runs / (st.ov + st.b/6) || 0).toFixed(2);
-            document.getElementById('d-status').innerText = st.inn + (st.inn==1?"ST":"ND") + " INNINGS | CRR: " + crr;
-        }
-    </script>
-</body>
-</html>
+                <input type="text" id="i-bowl" placeholder="Current Bowler Name" oninput="upd()">
+                <input type="text" id="i-tour" placeholder="Tournament" oninput="up
+                    
