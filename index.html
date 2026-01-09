@@ -7,16 +7,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
         body { background: #0e0e0e; font-family: 'Roboto', sans-serif; margin: 0; padding: 20px; color: white; display: flex; flex-direction: column; align-items: center; }
 
-        /* RECENT BALLS STRIP */
-        .recent-balls { width: 900px; display: flex; justify-content: flex-end; gap: 5px; margin-bottom: 5px; font-size: 12px; font-weight: bold; }
-        .ball-tag { background: #333; padding: 2px 8px; border-radius: 4px; border: 1px solid #555; }
-
         /* SCOREBOARD */
         .scoreboard { width: 900px; position: relative; overflow: hidden; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
         
-        /* FLASH ANIMATION LAYER */
-        #flash-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; z-index: 10; text-transform: uppercase; letter-spacing: 5px; animation: flashAnim 0.5s infinite alternate; }
-        @keyframes flashAnim { from { opacity: 0.8; transform: scale(1); } to { opacity: 1; transform: scale(1.1); } }
+        #flash-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; z-index: 10; text-transform: uppercase; animation: flashAnim 0.4s infinite alternate; }
+        @keyframes flashAnim { from { transform: scale(1); } to { transform: scale(1.1); } }
 
         .top-bar { display: flex; height: 60px; background: linear-gradient(90deg, #00122e, #003a8c); border-bottom: 3px solid #fec309; border-radius: 8px 8px 0 0; }
         .team-box { width: 120px; background: #fec309; color: #00122e; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; }
@@ -33,41 +28,40 @@
         .dot-active { background: #fec309; color: #000; }
         .dot-w { background: #fff; color: #d9534f; font-weight: 900; }
 
-        /* ADMIN PANEL - COMPACT 2 LINES */
-        .admin-panel { width: 900px; background: #fff; color: #222; padding: 12px; border-radius: 10px; margin-top: 15px; border: 4px solid #003a8c; }
-        .admin-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #003a8c; color: #fff; font-weight: bold; font-size: 13px; flex-grow: 1; }
+        /* MULTI-LINE ADMIN PANEL */
+        .admin-panel { width: 900px; background: #fff; color: #222; padding: 15px; border-radius: 10px; margin-top: 15px; border: 4px solid #003a8c; box-sizing: border-box; }
+        .admin-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
+        .label { font-size: 12px; font-weight: bold; width: 80px; color: #003a8c; }
+        
+        button { padding: 10px; cursor: pointer; border: none; border-radius: 5px; background: #003a8c; color: #fff; font-weight: bold; font-size: 13px; flex: 1; }
         .btn-red { background: #d9534f; }
         .btn-green { background: #2ecc71; color: #000; }
         .btn-yel { background: #fec309; color: #000; }
-        input { padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; width: 100px; flex-grow: 1; }
+        input { padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        select { padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="recent-balls" id="recent-wrap">
-        <span class="ball-tag">RECENT:</span>
-    </div>
-
     <div class="scoreboard">
         <div id="flash-overlay">FOUR</div>
         <div class="top-bar">
-            <div class="team-box" id="d-team">IND</div>
+            <div class="team-box" id="d-team">TEAM</div>
             <div class="score-box"><span id="d-runs">0</span>-<span id="d-wkt">0</span> <span style="font-size:16px; margin-left:8px;">(<span id="d-ov">0.0</span>)</span></div>
             <div class="bats-info">
-                <div id="b1-box"><span id="d-b1">BAT1</span><span id="d-b1s">*</span> <span id="d-b1r">0</span></div>
-                <div id="b2-box"><span id="d-b2">BAT2</span><span id="d-b2s"></span> <span id="d-b2r">0</span></div>
+                <div><span id="d-b1">BAT1</span><span id="d-b1s">*</span> <span id="d-b1r">0</span></div>
+                <div><span id="d-b2">BAT2</span><span id="d-b2s"></span> <span id="d-b2r">0</span></div>
             </div>
             <div class="opp-score-box">
-                <div style="font-size:10px; opacity:0.8;" id="d-opp-name">TARGET</div>
+                <div style="font-size:10px; opacity:0.8;">TARGET</div>
                 <div style="font-size:18px; font-weight:900;" id="d-opp-score">0</div>
             </div>
         </div>
         <div class="bottom-bar">
-            <span class="target-text" id="d-need">WAITING FOR TARGET...</span>
+            <span id="d-tour">TOURNAMENT</span> &nbsp;|&nbsp; <span class="target-text" id="d-need">WAITING FOR TARGET...</span>
             <div class="bowling-status">
                 <span id="d-bowl" style="color:white; font-size:11px;">BOWLER</span>
-                <div class="dots" style="display:flex; gap:5px;">
+                <div class="dots">
                     <div class="dot">1</div><div class="dot">2</div><div class="dot">3</div>
                     <div class="dot">4</div><div class="dot">5</div><div class="dot">6</div>
                 </div>
@@ -77,91 +71,58 @@
 
     <div class="admin-panel">
         <div class="admin-row">
-            <button onclick="run(1)">+1</button><button onclick="run(4)" class="btn-yel">FOUR</button><button onclick="run(6)" class="btn-yel">SIX</button>
+            <div class="label">SCORING:</div>
+            <button onclick="run(1)">+1</button>
+            <button onclick="run(4)" class="btn-yel">FOUR</button>
+            <button onclick="run(6)" class="btn-yel">SIX</button>
             <button onclick="run(-1)" class="btn-red">-1</button>
             <button onclick="ball()" class="btn-green">NEXT BALL</button>
             <button onclick="wicket()" class="btn-red">WICKET</button>
-            <button onclick="resetOv()">RESET OV</button>
+            <button onclick="resetOv()" class="btn-yel">RESET OVER</button>
         </div>
+
         <div class="admin-row">
-            <input type="text" id="i-team" placeholder="Team" oninput="upd()">
+            <div class="label">MATCH:</div>
+            <input type="text" id="i-team" placeholder="Batting Team" oninput="upd()">
+            <input type="text" id="i-tour" placeholder="Tournament Name" oninput="upd()">
+            <select id="i-match-type" onchange="upd()">
+                <option value="30">5 Overs</option>
+                <option value="60">10 Overs</option>
+                <option value="120" selected>20 Overs (T20)</option>
+                <option value="300">50 Overs (ODI)</option>
+            </select>
+        </div>
+
+        <div class="admin-row">
+            <div class="label">PLAYERS:</div>
             <input type="text" id="i-b1" placeholder="Batsman 1" oninput="upd()"><button style="flex:0;" onclick="strik(1)">*</button>
             <input type="text" id="i-b2" placeholder="Batsman 2" oninput="upd()"><button style="flex:0;" onclick="strik(2)">*</button>
-            <input type="text" id="i-bowl" placeholder="Bowler" oninput="upd()">
-            <input type="number" id="i-target" placeholder="Target Run" oninput="upd()">
+            <input type="text" id="i-bowl" placeholder="Bowler Name" oninput="upd()">
+        </div>
+
+        <div class="admin-row">
+            <div class="label">TARGET:</div>
+            <input type="number" id="i-target" placeholder="Enter Target Score (e.g. 151)" oninput="upd()">
+            <button class="btn-yel" onclick="location.reload()">REFRESH SCOREBOARD</button>
         </div>
     </div>
 
     <script>
-        let s = { r:0, w:0, b:0, o:0, b1r:0, b2r:0, str:1, cb:0, hist:[], target:0 };
+        let s = { r:0, w:0, b:0, o:0, b1r:0, b2r:0, str:1, cb:0, target:0, totalBalls:120 };
 
         function upd() {
-            document.getElementById('d-team').innerText = document.getElementById('i-team').value || "IND";
+            document.getElementById('d-team').innerText = document.getElementById('i-team').value || "TEAM";
+            document.getElementById('d-tour').innerText = document.getElementById('i-tour').value || "TOURNAMENT";
             document.getElementById('d-b1').innerText = document.getElementById('i-b1').value || "BAT1";
             document.getElementById('d-b2').innerText = document.getElementById('i-b2').value || "BAT2";
             document.getElementById('d-bowl').innerText = document.getElementById('i-bowl').value || "BOWLER";
             s.target = parseInt(document.getElementById('i-target').value) || 0;
+            s.totalBalls = parseInt(document.getElementById('i-match-type').value);
             document.getElementById('d-opp-score').innerText = s.target;
             refresh();
         }
 
         function run(v) {
             s.r += v;
-            if(s.str===1) s.b1r += v; else s.b2r += v;
-            if(v === 4) showFlash("FOUR", "#fec309");
-            if(v === 6) showFlash("SIX", "#2ecc71");
-            refresh();
-        }
-
-        function showFlash(txt, col) {
-            let f = document.getElementById('flash-overlay');
-            f.innerText = txt; f.style.background = col; f.style.color = (col==='#fff'?'red':'black');
-            f.style.display = 'flex';
-            setTimeout(() => { f.style.display = 'none'; }, 2000);
-        }
-
-        function ball() {
-            if(s.cb < 6) {
-                s.cb++; s.b++;
-                if(s.b>=6) { s.o++; s.b=0; }
-                document.querySelectorAll('.dot')[s.cb-1].classList.add('dot-active');
-                s.hist.push(s.r - (s.hist.length > 0 ? s.lastR : 0)); // simple logic for last ball
-                refresh();
-            }
-        }
-
-        function wicket() {
-            if(s.cb < 6) {
-                s.w++; s.cb++; s.b++;
-                if(s.b>=6) { s.o++; s.b=0; }
-                let d = document.querySelectorAll('.dot')[s.cb-1];
-                d.classList.add('dot-w'); d.innerText = "W";
-                showFlash("OUT", "#d9534f");
-                refresh();
-            }
-        }
-
-        function resetOv() {
-            s.cb = 0; document.querySelectorAll('.dot').forEach((d,i)=>{d.classList.remove('dot-active','dot-w'); d.innerText=i+1;});
-        }
-
-        function strik(n) { s.str = n; refresh(); }
-
-        function refresh() {
-            document.getElementById('d-runs').innerText = s.r;
-            document.getElementById('d-wkt').innerText = s.w;
-            document.getElementById('d-ov').innerText = s.o + "." + s.b;
-            document.getElementById('d-b1r').innerText = s.b1r;
-            document.getElementById('d-b2r').innerText = s.b2r;
-            document.getElementById('d-b1s').innerText = s.str===1 ? "*" : "";
-            document.getElementById('d-b2s').innerText = s.str===2 ? "*" : "";
-            
-            if(s.target > 0) {
-                let need = s.target - s.r;
-                let ballsLeft = 120 - (s.o * 6 + s.b); // Assuming T20
-                document.getElementById('d-need').innerText = `NEED ${need} RUNS IN ${ballsLeft} BALLS`;
-            }
-        }
-    </script>
-</body>
-</html>
+            if(s.str===1) s.
+                
