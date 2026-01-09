@@ -3,104 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Cricket Scoreboard Pro</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
-        body { background: #1a1a1a; font-family: 'Roboto', sans-serif; margin: 0; padding: 10px; color: white; display: flex; flex-direction: column; align-items: center; }
-
-        /* SCOREBOARD */
-        .scoreboard { width: 900px; filter: drop-shadow(0 8px 15px rgba(0,0,0,0.8)); margin-bottom: 15px; position: relative; }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
         
-        /* FLASH OVERLAY */
-        #flash-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; z-index: 10; border-radius: 8px; text-transform: uppercase; }
+        body { 
+            background: #0f0f0f; 
+            font-family: 'Roboto', sans-serif; 
+            margin: 0; padding: 20px; 
+            color: white; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
 
-        .top-bar { display: flex; height: 60px; background: linear-gradient(90deg, #00122e, #003a8c); border-bottom: 3px solid #fec309; border-radius: 8px 8px 0 0; position: relative; }
-        .team-box { width: 130px; background: #fec309; color: #00122e; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; }
-        .score-box { width: 200px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; background: #00122e; }
-        .bats-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-around; font-size: 17px; background: rgba(0,0,0,0.3); padding-right: 165px; }
-        
-        /* OPPONENT RESULT BOX (AS REQUESTED) */
-        .opp-score-box { position: absolute; right: 0; top: 0; height: 100%; width: 160px; background: #d9534f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 3px solid white; border-top-right-radius: 8px; }
-        .opp-name { font-size: 12px; font-weight: bold; opacity: 0.9; }
-        .opp-val { font-size: 18px; font-weight: 900; }
+        /* --- SCOREBOARD SECTION --- */
+        .main-container { width: 900px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
 
-        .bottom-bar { height: 40px; background: rgba(0,0,0,0.95); display: flex; align-items: center; padding: 0 15px; font-size: 14px; color: #fec309; border-radius: 0 0 8px 8px; }
-        
-        .bowling-status { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .dots { display: flex; gap: 8px; }
-        .dot { width: 25px; height: 25px; border-radius: 50%; background: #333; border: 1px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        .dot-active { background: #fec309; color: black; border-color: #fff; }
-        .dot-w { background: white; color: red; font-weight: bold; }
+        /* Neon Win Meter */
+        #neon-win-container { 
+            background: #000; border-radius: 12px 12px 0 0; 
+            padding: 12px 0 8px 0; border: 1px solid #333; border-bottom: none; 
+        }
+        .win-labels { display: flex; justify-content: space-between; padding: 0 20px 8px 20px; align-items: center; }
+        #txt-t1 { color: #00f2ff; text-shadow: 0 0 10px #00f2ff; font-weight: 900; font-size: 14px; text-transform: uppercase; }
+        #txt-t2 { color: #ff0055; text-shadow: 0 0 10px #ff0055; font-weight: 900; font-size: 14px; text-transform: uppercase; }
+        #d-live-calc { 
+            background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #444;
+            padding: 3px 15px; border-radius: 20px; font-size: 11px; font-weight: bold;
+        }
+        .neon-bar-bg { 
+            width: 96%; height: 10px; background: #111; border-radius: 10px; 
+            margin: 0 auto; display: flex; overflow: hidden; border: 1px solid #222;
+        }
+        #bar-t1 { 
+            width: 50%; height: 100%; background: linear-gradient(90deg, #0041ff, #00f2ff); 
+            box-shadow: 0 0 15px #00f2ff; transition: 1s ease; position: relative;
+        }
+        #bar-t2 { 
+            width: 50%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff4d00); 
+            box-shadow: 0 0 15px #ff0055; transition: 1s ease; position: relative;
+        }
+        .win-val { position: absolute; top: -18px; font-size: 14px; font-weight: 900; }
 
-        /* ADMIN PANEL - 4 CLEAR LINES */
-        .admin-panel { width: 900px; background: #ffffff; color: #222; border-radius: 12px; padding: 15px; border: 4px solid #003a8c; box-sizing: border-box; }
-        .admin-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-        .label { font-size: 12px; font-weight: bold; width: 90px; color: #003a8c; }
-        
-        button { padding: 10px; cursor: pointer; border: none; border-radius: 6px; background: #003a8c; color: white; font-weight: bold; font-size: 13px; flex: 1; }
-        .btn-red { background: #d9534f; }
-        .btn-green { background: #2ecc71; color: black; }
-        .btn-yel { background: #fec309; color: black; }
-        input { padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        /* Main Scoreboard Body */
+        .scoreboard { width: 100%; position: relative; }
+        #flash-overlay { 
+            position: absolute; width: 100%; height: 100%; display: none; 
+            align-items: center; justify-content: center; font-size: 50px; 
+            font-weight: 900; z-index: 100; text-transform: uppercase; 
+        }
+        .top-bar { 
+            display: flex; height: 70px; background: linear-gradient(90deg, #00122e, #002b6b); 
+            border-bottom: 4px solid #fec309; position: relative;
+        }
+        .team-box { width: 150px; background: #fec309; color: #00122e; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 26px; }
+        .score-box { width: 220px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; background: #00122e; }
+        .bats-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-around; font-size: 18px; padding-right: 170px; background: rgba(0,0,0,0.2); }
+        .opp-score-box { 
+            position: absolute; right: 0; top: 0; height: 100%; width: 170px; 
+            background: #d9534f; border-left: 3px solid #fff; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .bottom-bar { 
+            height: 45px; background: #000; display: flex; align-items: center; 
+            padding: 0 20px; font-size: 14px; color: #fec309; border-radius: 0 0 12px 12px;
+        }
+        .dot { width: 28px; height: 28px; border-radius: 50%; background: #222; border: 1px solid #444; display: flex; align-items: center; justify-content: center; margin-left: 8px; font-weight: bold; font-size: 12px;}
+        .dot-active { background: #fec309; color: #000; border-color: #fff; box-shadow: 0 0 8px #fec309; }
+        .dot-w { background: #fff; color: #d9534f; border-color: #d9534f; }
+
+        /* --- ADMIN PANEL SECTION --- */
+        .admin-panel { width: 900px; background: #fff; color: #222; border-radius: 12px; padding: 20px; margin-top: 20px; border: 5px solid #003a8c; box-sizing: border-box; }
+        .admin-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; }
+        .label { font-size: 12px; font-weight: 900; width: 100px; color: #003a8c; text-transform: uppercase; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 6px; font-weight: 900; font-size: 14px; flex: 1; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        .btn-blue { background: #003a8c; color: white; }
+        .btn-red { background: #d9534f; color: white; }
+        .btn-green { background: #2ecc71; color: white; }
+        .btn-yel { background: #fec309; color: #000; }
+        .btn-neon { background: #00f2ff; color: #000; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; flex: 1; font-size: 14px; }
     </style>
 </head>
 <body>
-<div id="neon-win-container" style="width: 900px; background: #000; border-radius: 8px 8px 0 0; padding: 10px 0 5px 0; border: 1px solid #333; border-bottom: none; font-family: 'Roboto', sans-serif;">
-    <div style="display: flex; justify-content: space-between; padding: 0 15px 5px 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">
-        <span id="txt-t1" style="color: #00f2ff; text-shadow: 0 0 8px #00f2ff;">TEAM 1</span>
-        <span id="mode-indicator" style="color: #fff; opacity: 0.4; font-size: 9px; border: 1px solid #444; padding: 1px 5px; border-radius: 3px;">AUTO MODE</span>
-        <span id="txt-t2" style="color: #ff0055; text-shadow: 0 0 8px #ff0055;">TEAM 2</span>
-    </div>
-    
-    <div style="width: 96%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 0 auto; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-        <div id="bar-t1" style="width: 50%; height: 100%; background: linear-gradient(90deg, #0041ff, #00f2ff); box-shadow: 0 0 12px #00f2ff; transition: width 1s ease-in-out; position: relative;">
-            <div style="position: absolute; right: 2px; top: -14px; font-size: 14px; color: #00f2ff; font-weight: 900;" id="val-t1">50%</div>
-        </div>
-        <div id="bar-t2" style="width: 50%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff4d00); box-shadow: 0 0 12px #ff0055; transition: width 1s ease-in-out; position: relative;">
-            <div style="position: absolute; left: 2px; top: -14px; font-size: 14px; color: #ff0055; font-weight: 900;" id="val-t2">50%</div>
-        </div>
-    </div>
-</div>
-<div id="neon-win-container" style="width: 900px; background: #000; border-radius: 8px 8px 0 0; padding: 10px 0 5px 0; border: 1px solid #333; border-bottom: none; font-family: 'Roboto', sans-serif;">
-    <div style="display: flex; justify-content: space-between; padding: 0 15px 5px 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; align-items: center;">
-        <span id="txt-t1" style="color: #00f2ff; text-shadow: 0 0 8px #00f2ff;">TEAM 1</span>
-        
-        <div id="d-live-calc" style="color: #fff; font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 10px; border: 1px solid #444; text-shadow: 0 0 5px #fff;">
-            WAITING FOR TARGET...
+
+    <div class="main-container">
+        <div id="neon-win-container">
+            <div class="win-labels">
+                <span id="txt-t1">TEAM 1</span>
+                <div id="d-live-calc">1ST INNINGS IN PROGRESS</div>
+                <span id="txt-t2">TEAM 2</span>
+            </div>
+            <div class="neon-bar-bg">
+                <div id="bar-t1">
+                    <div class="win-val" id="val-t1" style="right: 5px; color: #00f2ff;">50%</div>
+                </div>
+                <div id="bar-t2">
+                    <div class="win-val" id="val-t2" style="left: 5px; color: #ff0055;">50%</div>
+                </div>
+            </div>
         </div>
 
-        <span id="txt-t2" style="color: #ff0055; text-shadow: 0 0 8px #ff0055;">TEAM 2</span>
-    </div>
-    
-    <div style="width: 96%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 0 auto; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-        <div id="bar-t1" style="width: 50%; height: 100%; background: linear-gradient(90deg, #0041ff, #00f2ff); box-shadow: 0 0 12px #00f2ff; transition: width 1s ease-in-out; position: relative;">
-            <div style="position: absolute; right: 2px; top: -14px; font-size: 14px; color: #00f2ff; font-weight: 900;" id="val-t1">50%</div>
-        </div>
-        <div id="bar-t2" style="width: 50%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff4d00); box-shadow: 0 0 12px #ff0055; transition: width 1s ease-in-out; position: relative;">
-            <div style="position: absolute; left: 2px; top: -14px; font-size: 14px; color: #ff0055; font-weight: 900;" id="val-t2">50%</div>
-        </div>
-    </div>
-</div>
-    <div class="scoreboard">
-        <div id="flash-overlay">FOUR</div>
-        <div class="top-bar">
-            <div class="team-box" id="d-team">TEAM 1</div>
-            <div class="score-box"><span id="d-runs">0</span>-<span id="d-wkt">0</span> <span style="font-size:18px; margin-left:8px; opacity:0.8;">(<span id="d-ov">0.0</span>)</span></div>
-            <div class="bats-info">
-                <div><span id="d-b1">B1</span><span id="d-b1s">*</span> <span id="d-b1r">0</span></div>
-                <div><span id="d-b2">B2</span><span id="d-b2s"></span> <span id="d-b2r">0</span></div>
+        <div class="scoreboard">
+            <div id="flash-overlay">FOUR</div>
+            <div class="top-bar">
+                <div class="team-box" id="d-team">TEAM 1</div>
+                <div class="score-box"><span id="d-runs">0</span>-<span id="d-wkt">0</span> <span style="font-size:20px; margin-left:10px; opacity:0.7;">(<span id="d-ov">0.0</span>)</span></div>
+                <div class="bats-info">
+                    <div><span id="d-b1">B1</span><span id="d-b1s">*</span> <span id="d-b1r" style="font-weight:900;">0</span></div>
+                    <div><span id="d-b2">B2</span><span id="d-b2s"></span> <span id="d-b2r" style="font-weight:900;">0</span></div>
+                </div>
+                <div class="opp-score-box">
+                    <div style="font-size:12px; font-weight:bold; opacity:0.8;" id="d-opp-name">OPPONENT</div>
+                    <div style="font-size:20px; font-weight:900;" id="d-opp-val">0-0 (0.0)</div>
+                </div>
             </div>
-            <div class="opp-score-box">
-                <div class="opp-name" id="d-opp-name">OPPONENT</div>
-                <div class="opp-val" id="d-opp-score">0-0 (0.0)</div>
-            </div>
-        </div>
-        <div class="bottom-bar">
-            <span id="d-tour">TOURNAMENT</span> &nbsp;|&nbsp; <span id="d-status">1ST INNINGS | CRR: 0.00</span>
-            <div class="bowling-status">
-                <div id="d-bowl" style="color:white; font-weight:bold; font-size:12px;">BOWLER</div>
-                <div class="dots">
-                    <div class="dot">1</div><div class="dot">2</div><div class="dot">3</div>
-                    <div class="dot">4</div><div class="dot">5</div><div class="dot">6</div>
+            <div class="bottom-bar">
+                <span id="d-tour">TOURNAMENT NAME</span> &nbsp;|&nbsp; <span id="d-status">1ST INN | CRR: 0.00</span>
+                <div style="margin-left:auto; display:flex; align-items:center;">
+                    <span id="d-bowl" style="font-weight:bold; font-size:12px; color:#fff; margin-right:10px;">BOWLER</span>
+                    <div style="display:flex;" id="dots-container">
+                        <div class="dot">1</div><div class="dot">2</div><div class="dot">3</div><div class="dot">4</div><div class="dot">5</div><div class="dot">6</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,66 +132,76 @@
 
     <div class="admin-panel">
         <div class="admin-row">
-            <div class="label">LIVE SCORE:</div>
-            <button onclick="changeScore(1)">+1</button>
-            <button onclick="changeScore(4)" class="btn-yel">FOUR</button>
-            <button onclick="changeScore(6)" class="btn-yel">SIX</button>
-            <button onclick="changeScore(-1)" class="btn-red">-1</button>
+            <div class="label">Quick Score:</div>
+            <button class="btn-blue" onclick="changeScore(1)">+1</button>
+            <button class="btn-yel" onclick="changeScore(4)">FOUR</button>
+            <button class="btn-yel" onclick="changeScore(6)">SIX</button>
+            <button class="btn-red" onclick="changeScore(-1)">-1</button>
             <button class="btn-green" onclick="nextBall()">NEXT BALL</button>
             <button class="btn-red" onclick="addWicket()">WICKET</button>
-            <button class="btn-yel" onclick="resetOver()">RESET OVER</button>
+            <button class="btn-blue" style="flex:0.5" onclick="resetOver()">NEW OVER</button>
+        </div>
+
+        <div class="admin-row" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+            <div class="label">Win Controls:</div>
+            <button id="btn-mode" class="btn-yel" onclick="toggleWinMode()">MODE: AUTO</button>
+            <button class="btn-neon" onclick="manualAdjust(5)">T1 +5%</button>
+            <button class="btn-red" style="background:#ff0055" onclick="manualAdjust(-5)">T2 +5%</button>
+            <input type="number" id="i-manual-win" placeholder="Direct %" oninput="directWinInput()">
+            <button class="btn-blue" onclick="resetWinMeter()">RESET METER</button>
         </div>
 
         <div class="admin-row">
-            <div class="label">LIVE INFO:</div>
-            <input type="text" id="i-team" placeholder="Team Name" oninput="upd()">
-            <input type="text" id="i-tour" placeholder="Tournament" oninput="upd()">
-            <input type="text" id="i-bowl" placeholder="Bowler Name" oninput="upd()">
-            <button class="btn-yel" style="flex:0.5;" onclick="toggleInn()">TOGGLE INN</button>
+            <div class="label">Match Info:</div>
+            <input type="text" id="i-team" placeholder="Batting Team" oninput="upd()">
+            <input type="text" id="i-tour" placeholder="Tournament Name" oninput="upd()">
+            <input type="text" id="i-bowl" placeholder="Current Bowler" oninput="upd()">
+            <button class="btn-yel" style="flex:0.4" onclick="toggleInn()">TOGGLE INN</button>
         </div>
 
         <div class="admin-row">
-            <div class="label">BATSMEN:</div>
-            <input type="text" id="i-b1" placeholder="Batsman 1" oninput="upd()"><button style="flex:0;" onclick="setS(1)">Striker</button>
-            <input type="text" id="i-b2" placeholder="Batsman 2" oninput="upd()"><button style="flex:0;" onclick="setS(2)">Striker</button>
+            <div class="label">Batsmen:</div>
+            <input type="text" id="i-b1" placeholder="Batsman 1" oninput="upd()"> <button class="btn-blue" style="flex:0.2" onclick="setS(1)">Striker</button>
+            <input type="text" id="i-b2" placeholder="Batsman 2" oninput="upd()"> <button class="btn-blue" style="flex:0.2" onclick="setS(2)">Striker</button>
         </div>
 
         <div class="admin-row">
-            <div class="label">OPPONENT:</div>
-            <input type="text" id="i-opp-name" placeholder="Opp Name" oninput="upd()">
-            <input type="text" id="i-opp-score" placeholder="Opp Score (e.g. 150-5)" oninput="upd()">
-            <input type="text" id="i-opp-over" placeholder="Opp Overs (e.g. 20.0)" oninput="upd()">
+            <div class="label">Opponent:</div>
+            <input type="text" id="i-opp-name" placeholder="Opponent Name" oninput="upd()">
+            <input type="text" id="i-opp-score" placeholder="Target/Score (e.g. 150)" oninput="upd()">
+            <input type="text" id="i-opp-ov" placeholder="Opp. Overs" oninput="upd()">
+            <button class="btn-red" onclick="location.reload()">RESET ALL</button>
         </div>
     </div>
 
     <script>
         let st = { r:0, w:0, b:0, o:0, b1r:0, b2r:0, s:1, inn:1, curBall:0 };
+        let isAutoMode = true; let manualWinVal = 50;
 
         function upd() {
             document.getElementById('d-team').innerText = document.getElementById('i-team').value || "TEAM 1";
-            document.getElementById('d-tour').innerText = document.getElementById('i-tour').value || "TOURNAMENT";
+            document.getElementById('d-tour').innerText = document.getElementById('i-tour').value || "TOURNAMENT NAME";
             document.getElementById('d-b1').innerText = document.getElementById('i-b1').value || "B1";
             document.getElementById('d-b2').innerText = document.getElementById('i-b2').value || "B2";
-            document.getElementById('d-bowl').innerText = document.getElementById('i-bowl').value || "BOWLER";
-            document.getElementById('d-opp-name').innerText = document.getElementById('i-opp-name').value || "OPPONENT";
+            document.getElementById('d-bowl').innerText = (document.getElementById('i-bowl').value || "BOWLER").toUpperCase();
+            document.getElementById('d-opp-name').innerText = (document.getElementById('i-opp-name').value || "OPPONENT").toUpperCase();
             
             let oScore = document.getElementById('i-opp-score').value || "0-0";
-            let oOver = document.getElementById('i-opp-over').value || "0.0";
-            document.getElementById('d-opp-score').innerText = oScore + " (" + oOver + ")";
+            let oOv = document.getElementById('i-opp-ov').value || "0.0";
+            document.getElementById('d-opp-val').innerText = oScore + " (" + oOv + ")";
             refresh();
         }
 
         function changeScore(v) {
-            st.r += v;
-            if(st.s===1) st.b1r += v; else st.b2r += v;
-            if(v === 4) triggerFlash("FOUR", "#fec309");
-            if(v === 6) triggerFlash("SIX", "#2ecc71");
+            st.r += v; if(st.s===1) st.b1r += v; else st.b2r += v;
+            if(v === 4) triggerFlash("FOUR", "#fec309", "#000");
+            if(v === 6) triggerFlash("SIX", "#2ecc71", "#000");
             refresh();
         }
 
-        function triggerFlash(txt, bg) {
+        function triggerFlash(txt, bg, col) {
             let f = document.getElementById('flash-overlay');
-            f.innerText = txt; f.style.background = bg; f.style.color = (txt==="OUT"?"white":"black");
+            f.innerText = txt; f.style.background = bg; f.style.color = col;
             f.style.display = "flex";
             setTimeout(() => { f.style.display = "none"; }, 1500);
         }
@@ -177,8 +211,7 @@
                 st.curBall++; st.b++;
                 if(st.b >= 6) { st.o++; st.b = 0; }
                 document.querySelectorAll('.dot')[st.curBall-1].classList.add('dot-active');
-            }
-            refresh();
+            } refresh();
         }
 
         function addWicket() {
@@ -187,9 +220,8 @@
                 if(st.b >= 6) { st.o++; st.b = 0; }
                 let d = document.querySelectorAll('.dot')[st.curBall-1];
                 d.classList.add('dot-w'); d.innerText = "W";
-                triggerFlash("OUT", "#d9534f");
-            }
-            refresh();
+                triggerFlash("OUT", "#d9534f", "#fff");
+            } refresh();
         }
 
         function resetOver() {
@@ -197,10 +229,15 @@
             document.querySelectorAll('.dot').forEach((d, i) => { d.classList.remove('dot-active', 'dot-w'); d.innerText = i + 1; });
         }
 
+        function toggleWinMode() { isAutoMode = !isAutoMode; refresh(); }
+        function manualAdjust(v) { isAutoMode = false; manualWinVal += v; refresh(); }
+        function directWinInput() { let v = parseInt(document.getElementById('i-manual-win').value); if(!isNaN(v)) { isAutoMode = false; manualWinVal = v; refresh(); } }
+        function resetWinMeter() { isAutoMode = true; manualWinVal = 50; refresh(); }
         function setS(n) { st.s = n; refresh(); }
         function toggleInn() { st.inn = st.inn === 1 ? 2 : 1; refresh(); }
 
         function refresh() {
+            // Main Display
             document.getElementById('d-runs').innerText = st.r;
             document.getElementById('d-wkt').innerText = st.w;
             document.getElementById('d-ov').innerText = st.o + "." + st.b;
@@ -208,195 +245,47 @@
             document.getElementById('d-b2r').innerText = st.b2r;
             document.getElementById('d-b1s').innerText = st.s===1 ? "*" : "";
             document.getElementById('d-b2s').innerText = st.s===2 ? "*" : "";
+            
             let crr = (st.r / (st.o + st.b/6) || 0).toFixed(2);
             document.getElementById('d-status').innerText = st.inn + (st.inn==1?"ST":"ND") + " INNINGS | CRR: " + crr;
-        }
-    </script>
-    <div class="admin-panel" style="width: 900px; margin-top: 5px; border-top: none; border-radius: 0 0 12px 12px;">
-    <div class="admin-row" style="background: #f1f1f1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
-        <div class="label" style="width: 130px;">PRO WIN METER:</div>
-        
-        <button id="btn-mode" class="btn-yel" style="flex: 0.8;" onclick="toggleWinMode()">MODE: AUTO</button>
-        
-        <button class="btn-green" style="background:#00f2ff; color:black; border:1px solid #00c2cc;" onclick="manualAdjust(5)">T1 +5%</button>
-        <button class="btn-green" style="background:#0041ff; color:white;" onclick="manualAdjust(-5)">T1 -5%</button>
-        
-        <input type="number" id="manual-win-input" placeholder="Set %" style="width:70px; flex: 0.4; border: 2px solid #003a8c;" oninput="directWinInput()">
-        
-        <button class="btn-red" onclick="resetWinMeter()">RESET</button>
-    </div>
-</div>
 
-<script>
-    let isAutoMode = true;
-    let manualWinVal = 50;
+            // Win Meter & Calc Logic
+            let finalWin1 = 50;
+            let calcText = "1ST INNINGS IN PROGRESS";
+            let target = parseInt(document.getElementById('i-opp-score').value) || 0;
 
-    function toggleWinMode() {
-        isAutoMode = !isAutoMode;
-        updateModeUI();
-    }
-
-    function updateModeUI() {
-        const btn = document.getElementById('btn-mode');
-        const indicator = document.getElementById('mode-indicator');
-        if (isAutoMode) {
-            btn.innerText = "MODE: AUTO";
-            btn.style.background = "#fec309";
-            indicator.innerText = "AUTO MODE";
-        } else {
-            btn.innerText = "MODE: MANUAL";
-            btn.style.background = "#2ecc71";
-            indicator.innerText = "MANUAL MODE";
-        }
-        updateWinUI();
-    }
-
-    function manualAdjust(v) {
-        isAutoMode = false;
-        manualWinVal += v;
-        if(manualWinVal > 95) manualWinVal = 95;
-        if(manualWinVal < 5) manualWinVal = 5;
-        updateModeUI();
-    }
-
-    function directWinInput() {
-        let val = parseInt(document.getElementById('manual-win-input').value);
-        if(!isNaN(val)) {
-            isAutoMode = false;
-            manualWinVal = val;
-            updateModeUI();
-        }
-    }
-
-    function resetWinMeter() {
-        isAutoMode = true;
-        manualWinVal = 50;
-        updateModeUI();
-    }
-
-    function updateWinUI() {
-        let finalWin1 = 50;
-
-        if (isAutoMode) {
-            // TARGET BASED AUTO LOGIC
-            let runs = (typeof st !== 'undefined') ? st.r : 0;
-            let wkts = (typeof st !== 'undefined') ? st.w : 0;
-            let balls = (typeof st !== 'undefined') ? (st.o * 6 + st.b) : 0;
-            let target = parseInt(document.getElementById('i-opp-score')?.value) || 0;
-
-            if (target > 0) {
-                // Agar target set hai to uske hisab se logic
-                let need = target - runs;
-                let ballsLeft = 120 - balls; // Default T20
-                if (ballsLeft <= 0) ballsLeft = 1;
-                
-                let rrr = (need / (ballsLeft / 6));
-                finalWin1 = 100 - (rrr * 8) - (wkts * 5); 
-            } else {
-                // Agar target nahi hai (1st Inning) to runs/wkt logic
-                finalWin1 = 50 + (runs / 5) - (wkts * 7) - (balls / 15);
-            }
-        } else {
-            finalWin1 = manualWinVal;
-        }
-
-        // Percentage Bound (4% to 96%)
-        if (finalWin1 > 96) finalWin1 = 96;
-        if (finalWin1 < 4) finalWin1 = 4;
-        
-        let w1 = Math.round(finalWin1);
-        let w2 = 100 - w1;
-
-        // Apply UI Updates
-        document.getElementById('bar-t1').style.width = w1 + "%";
-        document.getElementById('bar-t2').style.width = w2 + "%";
-        document.getElementById('val-t1').innerText = w1 + "%";
-        document.getElementById('val-t2').innerText = w2 + "%";
-
-        // Sync Team Names from Admin Panel
-        document.getElementById('txt-t1').innerText = document.getElementById('i-team')?.value || "TEAM 1";
-        document.getElementById('txt-t2').innerText = document.getElementById('i-opp-name')?.value || "TEAM 2";
-    }
-
-    // Refresh every second
-    setInterval(updateWinUI, 1000);
-</script>
-   <script>
-    let isAutoMode = true;
-    let manualWinVal = 50;
-
-    // Is function ko har second refresh karne ke liye setInterval mein rakhein
-    function updateWinMeterCore() {
-        let runs = (typeof st !== 'undefined') ? st.r : 0;
-        let wkts = (typeof st !== 'undefined') ? st.w : 0;
-        let ballsPlayed = (typeof st !== 'undefined') ? (st.o * 6 + st.b) : 0;
-        
-        // Target uthana (Innings 2 ke liye)
-        let rawTarget = document.getElementById('i-opp-score')?.value || "0";
-        let target = parseInt(rawTarget.split('-')[0]) || 0;
-        
-        let finalWin1 = 50;
-        let calcText = "1ST INNINGS PROGRESS";
-
-        if (isAutoMode) {
-            if (target > 0) {
-                let need = target - runs;
-                let ballsLeft = 120 - ballsPlayed; // T20 Standard
-                if (ballsLeft < 0) ballsLeft = 0;
-                
-                if (need <= 0) {
-                    calcText = "MATCH WON!";
-                    finalWin1 = 100;
-                } else {
-                    calcText = `NEED ${need} RUNS IN ${ballsLeft} BALLS`;
-                    // Auto Probability Logic
+            if (isAutoMode) {
+                if (st.inn === 2 && target > 0) {
+                    let need = target - st.r;
+                    let ballsLeft = 120 - (st.o * 6 + st.b);
+                    if (ballsLeft < 0) ballsLeft = 0;
+                    calcText = need > 0 ? `NEED ${need} RUNS IN ${ballsLeft} BALLS` : "MATCH WON!";
                     let rrr = (need / (ballsLeft / 6 || 1));
-                    finalWin1 = 100 - (rrr * 8) - (wkts * 5);
+                    finalWin1 = 100 - (rrr * 8) - (st.w * 5);
+                } else {
+                    finalWin1 = 50 + (st.r / 5) - (st.w * 7) - ((st.o * 6 + st.b) / 15);
                 }
             } else {
-                finalWin1 = 50 + (runs / 5) - (wkts * 7) - (ballsPlayed / 15);
+                finalWin1 = manualWinVal;
+                calcText = "MANUAL OVERRIDE ON";
             }
-        } else {
-            finalWin1 = manualWinVal;
-            calcText = "MANUAL OVERRIDE ON";
+
+            if (finalWin1 > 96) finalWin1 = 96; if (finalWin1 < 4) finalWin1 = 4;
+            document.getElementById('bar-t1').style.width = Math.round(finalWin1) + "%";
+            document.getElementById('bar-t2').style.width = (100 - Math.round(finalWin1)) + "%";
+            document.getElementById('val-t1').innerText = Math.round(finalWin1) + "%";
+            document.getElementById('val-t2').innerText = (100 - Math.round(finalWin1)) + "%";
+            document.getElementById('d-live-calc').innerText = calcText;
+
+            // Mode UI
+            let mBtn = document.getElementById('btn-mode');
+            mBtn.innerText = isAutoMode ? "MODE: AUTO" : "MODE: MANUAL";
+            mBtn.style.background = isAutoMode ? "#fec309" : "#2ecc71";
+            
+            // Sync names again
+            document.getElementById('txt-t1').innerText = document.getElementById('i-team').value || "TEAM 1";
+            document.getElementById('txt-t2').innerText = document.getElementById('i-opp-name').value || "TEAM 2";
         }
-
-        // Percentage Limits
-        if (finalWin1 > 96) finalWin1 = 96;
-        if (finalWin1 < 4) finalWin1 = 4;
-        
-        // UI Update
-        document.getElementById('bar-t1').style.width = Math.round(finalWin1) + "%";
-        document.getElementById('bar-t2').style.width = (100 - Math.round(finalWin1)) + "%";
-        document.getElementById('val-t1').innerText = Math.round(finalWin1) + "%";
-        document.getElementById('val-t2').innerText = (100 - Math.round(finalWin1)) + "%";
-        document.getElementById('d-live-calc').innerText = calcText;
-        
-        // Sync Names
-        document.getElementById('txt-t1').innerText = document.getElementById('i-team')?.value || "TEAM 1";
-        document.getElementById('txt-t2').innerText = document.getElementById('i-opp-name')?.value || "TEAM 2";
-    }
-
-    // Manual Functions for Admin Panel
-    function toggleWinMode() { isAutoMode = !isAutoMode; updateWinMeterCore(); }
-    function manualAdjust(v) { isAutoMode = false; manualWinVal += v; updateWinMeterCore(); }
-    function directWinInput() { 
-        let val = parseInt(document.getElementById('manual-win-input').value);
-        if(!isNaN(val)) { isAutoMode = false; manualWinVal = val; updateWinMeterCore(); }
-    }
-    function resetWinMeter() { isAutoMode = true; manualWinVal = 50; updateWinMeterCore(); }
-
-    // Isko refresh loop mein daalna
-    setInterval(updateWinMeterCore, 1000);
-</script>
-
-<div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:8px; border:1px solid #ccc; margin-top:5px;">
-    <div class="label" style="width:120px;">WIN METER:</div>
-    <button class="btn-yel" style="flex:0.6;" onclick="toggleWinMode()">AUTO/MANUAL</button>
-    <button style="background:#00f2ff; color:black;" onclick="manualAdjust(5)">T1 +5%</button>
-    <button style="background:#ff0055; color:white;" onclick="manualAdjust(-5)">T2 +5%</button>
-    <input type="number" id="manual-win-input" placeholder="Set %" style="width:70px;" oninput="directWinInput()">
-    <button class="btn-red" onclick="resetWinMeter()">RESET</button>
-</div> 
+    </script>
 </body>
 </html>
