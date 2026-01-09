@@ -60,7 +60,26 @@
         </div>
     </div>
 </div>
+<div id="neon-win-container" style="width: 900px; background: #000; border-radius: 8px 8px 0 0; padding: 10px 0 5px 0; border: 1px solid #333; border-bottom: none; font-family: 'Roboto', sans-serif;">
+    <div style="display: flex; justify-content: space-between; padding: 0 15px 5px 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; align-items: center;">
+        <span id="txt-t1" style="color: #00f2ff; text-shadow: 0 0 8px #00f2ff;">TEAM 1</span>
+        
+        <div id="d-live-calc" style="color: #fff; font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 10px; border: 1px solid #444; text-shadow: 0 0 5px #fff;">
+            WAITING FOR TARGET...
+        </div>
 
+        <span id="txt-t2" style="color: #ff0055; text-shadow: 0 0 8px #ff0055;">TEAM 2</span>
+    </div>
+    
+    <div style="width: 96%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 0 auto; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+        <div id="bar-t1" style="width: 50%; height: 100%; background: linear-gradient(90deg, #0041ff, #00f2ff); box-shadow: 0 0 12px #00f2ff; transition: width 1s ease-in-out; position: relative;">
+            <div style="position: absolute; right: 2px; top: -14px; font-size: 14px; color: #00f2ff; font-weight: 900;" id="val-t1">50%</div>
+        </div>
+        <div id="bar-t2" style="width: 50%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff4d00); box-shadow: 0 0 12px #ff0055; transition: width 1s ease-in-out; position: relative;">
+            <div style="position: absolute; left: 2px; top: -14px; font-size: 14px; color: #ff0055; font-weight: 900;" id="val-t2">50%</div>
+        </div>
+    </div>
+</div>
     <div class="scoreboard">
         <div id="flash-overlay">FOUR</div>
         <div class="top-bar">
@@ -302,6 +321,82 @@
     // Refresh every second
     setInterval(updateWinUI, 1000);
 </script>
-    
+   <script>
+    let isAutoMode = true;
+    let manualWinVal = 50;
+
+    // Is function ko har second refresh karne ke liye setInterval mein rakhein
+    function updateWinMeterCore() {
+        let runs = (typeof st !== 'undefined') ? st.r : 0;
+        let wkts = (typeof st !== 'undefined') ? st.w : 0;
+        let ballsPlayed = (typeof st !== 'undefined') ? (st.o * 6 + st.b) : 0;
+        
+        // Target uthana (Innings 2 ke liye)
+        let rawTarget = document.getElementById('i-opp-score')?.value || "0";
+        let target = parseInt(rawTarget.split('-')[0]) || 0;
+        
+        let finalWin1 = 50;
+        let calcText = "1ST INNINGS PROGRESS";
+
+        if (isAutoMode) {
+            if (target > 0) {
+                let need = target - runs;
+                let ballsLeft = 120 - ballsPlayed; // T20 Standard
+                if (ballsLeft < 0) ballsLeft = 0;
+                
+                if (need <= 0) {
+                    calcText = "MATCH WON!";
+                    finalWin1 = 100;
+                } else {
+                    calcText = `NEED ${need} RUNS IN ${ballsLeft} BALLS`;
+                    // Auto Probability Logic
+                    let rrr = (need / (ballsLeft / 6 || 1));
+                    finalWin1 = 100 - (rrr * 8) - (wkts * 5);
+                }
+            } else {
+                finalWin1 = 50 + (runs / 5) - (wkts * 7) - (ballsPlayed / 15);
+            }
+        } else {
+            finalWin1 = manualWinVal;
+            calcText = "MANUAL OVERRIDE ON";
+        }
+
+        // Percentage Limits
+        if (finalWin1 > 96) finalWin1 = 96;
+        if (finalWin1 < 4) finalWin1 = 4;
+        
+        // UI Update
+        document.getElementById('bar-t1').style.width = Math.round(finalWin1) + "%";
+        document.getElementById('bar-t2').style.width = (100 - Math.round(finalWin1)) + "%";
+        document.getElementById('val-t1').innerText = Math.round(finalWin1) + "%";
+        document.getElementById('val-t2').innerText = (100 - Math.round(finalWin1)) + "%";
+        document.getElementById('d-live-calc').innerText = calcText;
+        
+        // Sync Names
+        document.getElementById('txt-t1').innerText = document.getElementById('i-team')?.value || "TEAM 1";
+        document.getElementById('txt-t2').innerText = document.getElementById('i-opp-name')?.value || "TEAM 2";
+    }
+
+    // Manual Functions for Admin Panel
+    function toggleWinMode() { isAutoMode = !isAutoMode; updateWinMeterCore(); }
+    function manualAdjust(v) { isAutoMode = false; manualWinVal += v; updateWinMeterCore(); }
+    function directWinInput() { 
+        let val = parseInt(document.getElementById('manual-win-input').value);
+        if(!isNaN(val)) { isAutoMode = false; manualWinVal = val; updateWinMeterCore(); }
+    }
+    function resetWinMeter() { isAutoMode = true; manualWinVal = 50; updateWinMeterCore(); }
+
+    // Isko refresh loop mein daalna
+    setInterval(updateWinMeterCore, 1000);
+</script>
+
+<div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:8px; border:1px solid #ccc; margin-top:5px;">
+    <div class="label" style="width:120px;">WIN METER:</div>
+    <button class="btn-yel" style="flex:0.6;" onclick="toggleWinMode()">AUTO/MANUAL</button>
+    <button style="background:#00f2ff; color:black;" onclick="manualAdjust(5)">T1 +5%</button>
+    <button style="background:#ff0055; color:white;" onclick="manualAdjust(-5)">T2 +5%</button>
+    <input type="number" id="manual-win-input" placeholder="Set %" style="width:70px;" oninput="directWinInput()">
+    <button class="btn-red" onclick="resetWinMeter()">RESET</button>
+</div> 
 </body>
 </html>
