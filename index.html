@@ -64,7 +64,7 @@
         .page { display: none; padding: 15px; padding-bottom: 100px; }
         .page.active { display: block; }
 
-        /* --- ADMIN PANEL ELEMENTS --- */
+        /* --- ADMIN PANEL & HISTORY STYLES --- */
         .admin-card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
         button { padding: 12px; font-weight: 900; border: none; border-radius: 6px; cursor: pointer; flex: 1; font-size: 12px; text-transform: uppercase; }
@@ -74,6 +74,7 @@
         .btn-green { background: #28a745; color: white; }
         input { width: 95%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; }
         label { display: block; font-size: 10px; color: #888; margin-bottom: 5px; font-weight: 900; }
+        .match-card { background: #222; padding: 10px; margin-top: 10px; border-radius: 8px; border-left: 5px solid var(--primary); cursor: pointer; }
     </style>
 </head>
 <body onload="startClock(); setupHistoryYears();">
@@ -144,11 +145,21 @@
 
     <div id="page-history" class="page">
         <h3>Archives</h3>
-        <div id="year-buttons-container" style="display: flex; gap: 10px;"></div>
+        <div id="year-buttons-container" style="display: flex; gap: 10px; margin-bottom:15px;"></div>
+        <div id="hist-matches-list">सालों पर क्लिक करके मैच देखें...</div>
+        <div id="history-detail-view" style="display:none; background:#111; padding:15px; border-radius:10px; margin-top:15px; border:1px solid var(--primary);">
+            <button onclick="document.getElementById('history-detail-view').style.display='none'" class="btn-red" style="padding:5px; margin-bottom:10px;">CLOSE</button>
+            <div id="h-player-stats"></div>
+        </div>
     </div>
 
     <div id="page-squad" class="page">
-        <h3>Playing XI</h3>
+        <h3>Playing XI Management</h3>
+        <div class="admin-card">
+            <label>Add Player to Squad</label>
+            <input type="text" id="squad-input" placeholder="Enter Player Name">
+            <button class="btn-blue" onclick="addToSquad()">ADD TO LIST</button>
+        </div>
         <div id="player-list-display">No players added yet.</div>
     </div>
 
@@ -170,7 +181,7 @@
                 <div class="btn-row">
                     <button class="btn-yel" onclick="triggerAnim('FOUR', 4)">FOUR</button>
                     <button class="btn-yel" onclick="triggerAnim('SIX', 6)">SIX</button>
-                    <button class="btn-red" onclick="nextBall('w')">WICKET</button>
+                    <button class="btn-red" onclick="handleWicket()">WICKET</button>
                     <button class="btn-green" onclick="nextBall('n')">NEXT BALL</button>
                 </div>
                 <div class="btn-row">
@@ -179,7 +190,7 @@
             </div>
 
             <div class="admin-card">
-                <label>BATSMEN NAMES</label>
+                <label>BATSMEN NAMES (Manual or from Squad)</label>
                 <input type="text" id="i-b1" placeholder="Batsman 1 Name" oninput="saveData()">
                 <input type="text" id="i-b2" placeholder="Batsman 2 Name" oninput="saveData()">
                 <label>BOWLER NAME</label>
@@ -193,7 +204,12 @@
                 <input type="text" id="i-opp-score" placeholder="Opponent Full Score (Ex: 145-6 20.0)" oninput="saveData()">
                 <input type="number" id="i-target" placeholder="Match Target" oninput="saveData()">
                 <input type="text" id="i-tour" placeholder="Tournament Name" oninput="saveData()">
-                <button class="btn-red" onclick="resetDB()" style="width:100%;">RESET ALL DATA</button>
+            </div>
+
+            <div class="admin-card">
+                <label>FINAL ACTIONS</label>
+                <button class="btn-green" onclick="finishAndArchive()" style="width:100%; margin-bottom:10px;">💾 FINISH & SAVE TO HISTORY</button>
+                <button class="btn-red" onclick="resetDB()" style="width:100%;">RESET LIVE DATA</button>
             </div>
         </div>
     </div>
@@ -210,15 +226,16 @@
         const firebaseConfig = { databaseURL: "Https://myscoreboard-b140f-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref("pro_v20_master");
+        const archRef = firebase.database().ref("history_archives");
 
         let st = { 
             r:0, w:0, o:0, b:0, t1:"TEAM A", t2:"TEAM B", tour:"TOURNAMENT", 
             oppS:"0-0 (0.0)", target:0, strike:1, bowl:"BOWLER", 
             p1:{name:"BATSMAN 1", r:0, b:0}, p2:{name:"BATSMAN 2", r:0, b:0}, 
-            anim:"", inn: "1ST INNINGS"
+            anim:"", inn: "1ST INNINGS", squad: []
         };
 
-        // --- UTILS ---
+        // --- CLOCK ---
         function startClock() {
             setInterval(() => {
                 const now = new Date();
@@ -227,17 +244,7 @@
             }, 1000);
         }
 
-        function setupHistoryYears() {
-            const container = document.getElementById('year-buttons-container');
-            const currentYear = new Date().getFullYear();
-            for (let i = currentYear - 2; i <= currentYear; i++) {
-                let btn = document.createElement('button');
-                btn.innerText = i; btn.className = "btn-blue";
-                btn.onclick = () => alert("Year " + i + " Archives Empty.");
-                container.appendChild(btn);
-            }
-        }
-
+        // --- NAVIGATION & ADMIN ---
         function showPage(p, el) {
             document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
             document.getElementById('page-'+p).classList.add('active');
@@ -266,6 +273,15 @@
             saveData();
         }
 
+        function handleWicket() {
+            let nextPlayer = prompt("Wicket! Enter New Batsman Name:");
+            if(nextPlayer) {
+                if(st.strike === 1) { st.p1 = {name: nextPlayer, r:0, b:0}; }
+                else { st.p2 = {name: nextPlayer, r:0, b:0}; }
+                nextBall('w');
+            }
+        }
+
         function changeStrike() { st.strike = st.strike === 1 ? 2 : 1; saveData(); }
 
         function triggerAnim(txt, runs) {
@@ -273,8 +289,28 @@
             setTimeout(() => { st.anim = ""; db.set(st); }, 2500);
         }
 
+        function addToSquad() {
+            let name = document.getElementById('squad-input').value;
+            if(name) {
+                if(!st.squad) st.squad = [];
+                st.squad.push(name);
+                document.getElementById('squad-input').value = "";
+                saveData();
+                renderSquad();
+            }
+        }
+
+        function renderSquad() {
+            let html = "";
+            if(st.squad) {
+                st.squad.forEach((p, i) => {
+                    html += `<div style="padding:10px; border-bottom:1px solid #333;">${i+1}. ${p}</div>`;
+                });
+            }
+            document.getElementById('player-list-display').innerHTML = html;
+        }
+
         function saveData() {
-            // Update names from inputs if they exist
             if(document.getElementById('i-b1')) {
                 st.p1.name = document.getElementById('i-b1').value || st.p1.name;
                 st.p2.name = document.getElementById('i-b2').value || st.p2.name;
@@ -290,58 +326,45 @@
 
         function resetDB() { if(confirm("Clear Match Data?")) { db.set(null); location.reload(); } }
 
-        // --- DATA SYNC ---
-        db.on("value", snap => {
-            const data = snap.val(); if(!data) return; st = data;
-            
-            // Score
-            document.getElementById('d-runs').innerText = st.r;
-            document.getElementById('d-wkt').innerText = st.w;
-            document.getElementById('d-ov').innerText = st.o + "." + st.b;
-            
-            // Teams & Info
-            document.getElementById('d-team').innerText = st.t1;
-            document.getElementById('txt-t1').innerText = st.t1;
-            document.getElementById('txt-t2').innerText = st.t2;
-            document.getElementById('d-opp-score').innerText = st.oppS;
-            document.getElementById('d-target').innerText = st.target;
-            document.getElementById('d-tour').innerText = st.tour;
-            document.getElementById('d-bowl').innerText = st.bowl;
+        // --- HISTORY & ARCHIVE ---
+        function finishAndArchive() {
+            if(!confirm("Finish Match and save to History?")) return;
+            let year = new Date().getFullYear();
+            let matchKey = Date.now();
+            let archiveData = {
+                teams: st.t1 + " vs " + st.t2,
+                score: st.r + "-" + st.w + " (" + st.o + "." + st.b + ")",
+                tour: st.tour,
+                date: new Date().toLocaleDateString(),
+                p1: st.p1, p2: st.p2
+            };
+            archRef.child(year).child(matchKey).set(archiveData).then(() => {
+                alert("Saved Successfully!");
+                resetDB();
+            });
+        }
 
-            // Batsmen Strike Logic
-            document.getElementById('d-b1').innerText = st.p1.name;
-            document.getElementById('d-b1-r').innerText = `${st.p1.r}(${st.p1.b})`;
-            document.getElementById('d-b2').innerText = st.p2.name;
-            document.getElementById('d-b2-r').innerText = `${st.p2.r}(${st.p2.b})`;
-            
-            document.getElementById('d-b1-s').innerText = st.strike===1 ? "★" : "";
-            document.getElementById('row-b1').className = st.strike===1 ? "batsman-row striker" : "batsman-row";
-            document.getElementById('d-b2-s').innerText = st.strike===2 ? "★" : "";
-            document.getElementById('row-b2').className = st.strike===2 ? "batsman-row striker" : "batsman-row";
-
-            // Live Equation & CRR
-            let totalBalls = (st.o * 6) + st.b;
-            let totalOv = totalBalls / 6;
-            let crr = totalOv > 0 ? (st.r / totalOv).toFixed(2) : "0.00";
-            document.getElementById('d-crr').innerText = crr;
-
-            if(st.target > 0) {
-                let runsNeeded = st.target - st.r;
-                let ballsLeft = 120 - totalBalls; // Assuming 20 Overs
-                if(runsNeeded <= 0) document.getElementById('d-equation').innerText = st.t1 + " WON THE MATCH!";
-                else document.getElementById('d-equation').innerText = `${st.t1} NEEDS ${runsNeeded} RUNS IN ${ballsLeft} BALLS`;
-                document.getElementById('d-inn-status').innerText = "2ND INNINGS";
-            } else {
-                document.getElementById('d-equation').innerText = "1ST INNINGS IN PROGRESS";
-                document.getElementById('d-inn-status').innerText = "1ST INNINGS";
+        function setupHistoryYears() {
+            const container = document.getElementById('year-buttons-container');
+            const startYear = 2025;
+            const currentYear = new Date().getFullYear();
+            container.innerHTML = "";
+            for (let i = startYear; i <= currentYear; i++) {
+                let btn = document.createElement('button');
+                btn.innerText = i; btn.className = "btn-blue";
+                btn.style.width = "auto"; btn.style.padding = "10px 20px";
+                btn.onclick = () => loadHistoryByYear(i);
+                container.appendChild(btn);
             }
+        }
 
-            // Dots & Anim
-            let dots = document.querySelectorAll('.dot');
-            dots.forEach((d, i) => d.className = i < st.b ? "dot active" : "dot");
-            document.getElementById('boundary-anim').style.display = st.anim ? 'flex' : 'none';
-            document.getElementById('boundary-anim').innerText = st.anim + "!";
-        });
-    </script>
-</body>
-</html>
+        function loadHistoryByYear(year) {
+            archRef.child(year).on('value', snap => {
+                let data = snap.val();
+                let html = "";
+                if(!data) html = "<p>No matches found for " + year + "</p>";
+                else {
+                    for(let key in data) {
+                        let m = data[key];
+                        html += `<div class="match-card" onclick="showHistDetail('${year}','${key}')">
+                            <b>${m.teams}</b><br><small>${m.date} | ${m.tour}</s
