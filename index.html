@@ -368,14 +368,37 @@
         }
 
         function showYear(y) {
-            archRef.child(y).once('value', snap => {
-                let html = "<ul>";
-                snap.forEach(m => {
-                    let d = m.val();
-                    html += `<li><b>${d.match}</b>: ${d.score} (${d.date})</li>`;
-                });
-                document.getElementById('history-content').innerHTML = html + "</ul>";
+    archRef.child(y).on('value', snap => {
+        let html = "<div style='display:grid; gap:10px;'>";
+        if(!snap.val()) {
+            html += "<p style='opacity:0.5'>इस साल कोई रिकॉर्ड नहीं है।</p>";
+        } else {
+            snap.forEach(m => {
+                let d = m.val();
+                let mKey = m.key; // मैच की यूनिक ID
+                html += `
+                    <div style="background:#111; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border-left:3px solid var(--primary);">
+                        <div>
+                            <b style="color:var(--primary)">${d.match}</b><br>
+                            <small>${d.score} | ${d.date}</small>
+                        </div>
+                        <button onclick="deleteMatch('${y}', '${mKey}')" style="background:red; color:white; padding:5px 10px; font-size:12px; width:auto; border-radius:5px;">DELETE</button>
+                    </div>`;
             });
+        }
+        document.getElementById('history-content').innerHTML = html + "</div>";
+    });
+}
+
+// डिलीट करने का नया फंक्शन
+function deleteMatch(year, key) {
+    if(confirm("क्या आप वाकई इस मैच को हिस्ट्री से हमेशा के लिए हटाना चाहते हैं?")) {
+        archRef.child(year).child(key).remove()
+        .then(() => alert("मैच डिलीट कर दिया गया!"))
+        .catch((error) => alert("Error: " + error));
+    }
+}
+     
         }
 
         function fullReset() {
