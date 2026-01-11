@@ -1,458 +1,280 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chhotu Ultra-Pro Scorer 2026</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    
+    <title>Master Cricket Scoreboard PRO</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Oswald:wght@500;700&display=swap');
+        :root { --p1: #00e5ff; --p2: #ff0040; --bg: #000814; --card: #00122e; }
+        body { margin: 0; background: var(--bg); font-family: 'Roboto', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; }
         
-        :root { --primary: #fec309; --neon-blue: #00e1ff; --neon-red: #ff0040; --bg: #030a16; }
-
-        body { background: var(--bg); color: white; font-family: 'Oswald', sans-serif; margin: 0; padding-bottom: 50px; }
-
-        /* --- PREMIUM BROADCAST SCOREBOARD --- */
-        .master-container { width: 100%; max-width: 1000px; margin: auto; position: sticky; top: 0; z-index: 1000; background: var(--bg); }
+        .master-container { width: 100%; max-width: 500px; background: var(--card); overflow: hidden; position: relative; transition: 0.3s; }
         
-        .top-status-bar { 
-            background: #000; display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 20px; font-size: 12px; font-family: 'Orbitron'; border-bottom: 1px solid #222;
-        }
+        /* Animation Flash Styles */
+        @keyframes flash-yellow { 0% { background: var(--card); } 50% { background: #fec309; } 100% { background: var(--card); } }
+        @keyframes flash-red { 0% { background: var(--card); } 50% { background: #ff0040; } 100% { background: var(--card); } }
+        .animate-four-six { animation: flash-yellow 0.5s ease 3; }
+        .animate-wicket { animation: flash-red 0.5s ease 3; }
 
-        .win-bar-container { height: 6px; background: #111; position: relative; display: flex; overflow: hidden; }
-        #win-p1 { 
-    background: var(--neon-blue); 
-    height: 100%; 
-    transition: 2s ease-in-out; 
-    box-shadow: 0 0 10px var(--neon-blue); 
-}
+        .top-status-bar { display: flex; height: 6px; width: 100%; }
+        #win-p1 { background: var(--p1); width: 50%; transition: 1s; }
+        #win-p2 { background: var(--p2); width: 50%; transition: 1s; }
 
-#win-p2 { 
-    background: var(--neon-red); 
-    height: 100%; 
-    transition: 2s ease-in-out; 
-    box-shadow: 0 0 10px var(--neon-red); 
-}
+        .main-board { padding: 15px; }
+        .score-row { display: flex; justify-content: space-between; align-items: center; }
+        .runs { font-family: 'Orbitron'; font-size: 55px; color: var(--p1); text-shadow: 0 0 15px rgba(0,229,255,0.4); }
+        .overs { font-size: 20px; opacity: 0.8; }
         
+        .projected-capsule { background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; margin-top: 5px; border: 1px solid rgba(255,255,255,0.2); }
 
-        .main-board { 
-            height: 70px; background: linear-gradient(90deg, #00122e 0%, #002b6b 100%);
-            display: flex; align-items: center; position: relative; overflow: hidden;
-            border-bottom: 3px solid var(--primary);
-        }
+        .player-box { margin-top: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; }
+        .b-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .active-bat { color: var(--p1); font-weight: bold; }
+        .active-bat::after { content: ' *'; }
 
-        .team-tag { 
-            background: var(--primary); color: #000; font-weight: 900; font-size: 22px;
-            padding: 0 25px; height: 100%; display: flex; align-items: center;
-            clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%); font-family: 'Orbitron';
-        }
+        .dots-row { display: flex; gap: 5px; margin-top: 10px; justify-content: center; }
+        .b-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .b-dot.active { background: var(--p1); box-shadow: 0 0 8px var(--p1); }
 
-        .live-score { font-size: 42px; font-weight: 900; padding: 0 15px; font-family: 'Orbitron'; letter-spacing: -2px; }
-        .overs-small { font-size: 16px; opacity: 0.7; color: #ccc; margin-left: 5px; }
-
-        .batsmen-section { flex-grow: 1; padding: 0 20px; border-left: 1px solid rgba(255,255,255,0.1); }
-        .b-row { font-size: 18px; display: flex; justify-content: space-between; margin: 2px 0; }
-        .active-bat { color: var(--primary); text-shadow: 0 0 10px rgba(254,195,9,0.5); }
-
-        .opp-box { background: rgba(255,255,255,0.05); height: 100%; padding: 0 15px; display: flex; flex-direction: column; justify-content: center; text-align: center; min-width: 120px; border-left: 1px solid #333; }
-        .target-label { font-size: 10px; color: var(--primary); letter-spacing: 1px; }
-
-        .bottom-strip { 
-            background: #000; padding: 5px 15px; display: flex; justify-content: space-between; 
-            align-items: center; font-size: 13px; font-weight: 700;
-        }
-
-        /* --- BALL TRACKER --- */
-        .ball-tracker { display: flex; gap: 5px; }
-        .b-dot { width: 22px; height: 22px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; border: 1px solid #444; }
-        .b-dot.active { background: var(--primary); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--primary); }
-
-        /* --- ADMIN PANEL --- */
-        .admin-section { padding: 20px; max-width: 900px; margin: auto; }
-        .login-card { text-align: center; background: #111; padding: 40px; border-radius: 15px; border: 1px solid #333; margin-top: 20px; }
-        
-        .control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .card { background: #0a1221; padding: 20px; border-radius: 12px; border: 1px solid #1a2a44; }
-        
-        .btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        button { padding: 12px; font-weight: 900; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: 'Oswald'; }
-        button:active { transform: scale(0.95); }
-        
-        .btn-run { background: #1a73e8; color: white; }
-        .btn-action { background: var(--primary); color: #000; }
-        .btn-danger { background: var(--neon-red); color: white; }
-        .btn-dark { background: #333; color: #fff; }
-
-        input { width: 93%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; font-size: 14px; }
-        label { font-size: 12px; color: var(--primary); display: block; margin-bottom: 5px; text-transform: uppercase; }
-
-        #boundary-msg { 
-            position: fixed; top: 30%; left: 0; width: 100%; background: var(--primary); color: #000;
-            font-size: 70px; font-weight: 900; text-align: center; padding: 20px 0; display: none; z-index: 2000;
-            font-family: 'Orbitron'; animation: zoomIn 0.4s;
-        }
-        @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
-
+        .admin-area { width: 93%; max-width: 400px; padding: 20px; margin-top: 20px; background: #111; border-radius: 15px; }
         .hidden { display: none !important; }
+        .btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-run { background: #1a73e8; }
+        .btn-action { background: #34a853; }
+        .btn-danger { background: #ea4335; }
+        .btn-dark { background: #333; }
+        button:active { transform: scale(0.95); }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        #d-equation { font-size: 13px; color: #fec309; text-align: center; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div id="boundary-msg">FOUR!</div>
-
-    <div class="master-container">
+    <div class="master-container" id="scoreboard-card">
         <div class="top-status-bar">
-            <div id="proj-container" style="text-align:center; margin-top:-10px; margin-bottom:5px;">
-    <span id="d-proj" style="background:white; color:black; padding:2px 15px; border-radius:20px; font-weight:900; font-size:12px; box-shadow:0 0 10px #fff;">PROJECTED SCORE: 0</span>
-</div>
+            <div id="win-p1"></div>
+            <div id="win-p2"></div>
+        </div>
 
-            <span id="d-tour">TOURNAMENT NAME</span>
-            <span id="d-clock">00:00:00</span>
-        </div>
-        <div class="win-bar-container">
-            <div id="win-p1" style="width: 50%;"></div>
-            <div id="win-p2" style="width: 50%;"></div>
-        </div>
         <div class="main-board">
-            <div class="team-tag" id="d-team">TEAM A</div>
-            <div class="live-score">
-                <span id="d-runs">0</span>-<span id="d-wkt">0</span>
-                <span class="overs-small">(<span id="d-ov">0.0</span>)</span>
-            </div>
-            <div class="batsmen-section">
-                <div id="p1-row" class="b-row active-bat">
-                    <span id="d-b1">BATSMAN 1</span> <span id="d-b1-r">0(0)</span>
+            <div style="font-size: 14px; opacity: 0.7; margin-bottom: 5px;" id="d-tour">TOURNAMENT</div>
+            <div class="score-row">
+                <div>
+                    <span id="d-team" style="font-weight: bold; font-size: 22px;">TEAM</span>
+                    <div class="runs"><span id="d-runs">0</span>/<span id="d-wkt">0</span></div>
+                    <div id="proj-container" class="projected-capsule">PROJECTED: 0</div>
                 </div>
-                <div id="p2-row" class="b-row">
-                    <span id="d-b2">BATSMAN 2</span> <span id="d-b2-r">0(0)</span>
+                <div class="overs">OV: <span id="d-ov">0.0</span></div>
+            </div>
+
+            <div class="player-box">
+                <div class="b-row" id="p1-row">
+                    <span id="d-b1">Player 1</span><span id="d-b1-r">0(0)</span>
                 </div>
-            </div>
-            <div class="opp-box">
-                <span id="d-opp-name" style="font-size: 12px; opacity: 0.6;">OPPONENT</span>
-                <span id="d-opp-score" style="font-size: 18px; font-weight: 900;">0-0 (0.0)</span>
-                <span class="target-label">TARGET: <span id="d-target">0</span></span>
-            </div>
-        </div>
-        <div class="bottom-strip">
-            <span id="d-equation">1ST INNINGS IN PROGRESS</span>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span>BOWLER: <span id="d-bowl" style="color:var(--primary)">WAITING</span></span>
-                <div class="ball-tracker" id="d-dots">
-                    <div class="b-dot">1</div><div class="b-dot">2</div><div class="b-dot">3</div><div class="b-dot">4</div><div class="b-dot">5</div><div class="b-dot">6</div>
+                <div class="b-row" id="p2-row">
+                    <span id="d-b2">Player 2</span><span id="d-b2-r">0(0)</span>
+                </div>
+                <div class="b-row" style="border:none; margin-top:5px; opacity:0.9;">
+                    <span>BOWLER: <span id="d-bowl">---</span></span>
+                    <span>TGT: <span id="d-target">0</span></span>
                 </div>
             </div>
+
+            <div class="dots-row" id="dots-container">
+                <div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div>
+                <div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div>
+            </div>
+            <div id="d-equation"></div>
         </div>
     </div>
 
-    <div class="admin-section">
-        <div id="login-area" class="login-card">
-            <h1 style="color:var(--primary); font-family: 'Orbitron';">🛡️ ADMIN ACCESS</h1>
-            <input type="password" id="pass-input" placeholder="ENTER SECURE PIN" style="text-align:center; font-size: 24px;">
-            <button class="btn-action" onclick="checkAuth()" style="width:100%; padding:20px;">UNLOCK CONTROLS</button>
+    <div class="admin-area">
+        <div id="login-area">
+            <input type="password" id="pass-input" placeholder="Enter Admin PIN">
+            <button class="btn-run" style="width:100%" onclick="checkAuth()">UNLOCK PANEL</button>
         </div>
 
         <div id="admin-panel" class="hidden">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color:var(--primary)">CONTROL DASHBOARD</h2>
-                <button class="btn-danger" onclick="lockPanel()">🔒 LOCK & EXIT</button>
+            <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="lockPanel()">LOCK PANEL</button>
+            <input type="text" id="inp-t1" placeholder="Team Name">
+            <input type="text" id="inp-tour" placeholder="Tournament Name">
+            <div class="btn-group">
+                <button class="btn-run" onclick="addRun(0)">0</button>
+                <button class="btn-run" onclick="addRun(1)">1</button>
+                <button class="btn-run" onclick="addRun(2)">2</button>
+                <button class="btn-run" onclick="addRun(3)">3</button>
+                <button class="btn-run" onclick="addRun(4)">4</button>
+                <button class="btn-run" onclick="addRun(6)">6</button>
+                <button class="btn-action" onclick="addRun(1, 'WD')">WD</button>
+                <button class="btn-action" onclick="addRun(1, 'NB')">NB</button>
             </div>
-
-            <div class="control-grid">
-                <div class="card">
-                    <label>Quick Scoring</label>
-                    <div class="btn-group">
-                        <button class="btn-run" onclick="addRun(1)">+1</button>
-                        <button class="btn-run" onclick="addRun(2)">+2</button>
-                        <button class="btn-run" onclick="addRun(3)">+3</button>
-                        <button class="btn-danger" onclick="addRun(-1)">-1</button>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn-action" onclick="showAnim('FOUR', 4)">4</button>
-                        <button class="btn-action" onclick="showAnim('SIX', 6)">6</button>
-                        <button class="btn-danger" onclick="outPlayer()" style="grid-column: span 2;">WICKET</button>
-                    </div>
-                    <button class="btn-run" onclick="nextBall()" style="width:100%; background:#00c853;">NEXT BALL (DOT)</button>
-                    <button class="btn-dark" onclick="swapStrike()" style="width:100%; margin-top:10px;">🔄 SWAP STRIKER</button>
-                </div>
-
-                <div class="card">
-                    <label>Match Setup</label>
-                    <input type="text" id="i-tour" placeholder="Tournament Name" oninput="pushData()">
-                    <input type="text" id="i-t1" placeholder="Batting Team Name" oninput="pushData()">
-                    <input type="text" id="i-b1" placeholder="Striker Name" oninput="pushData()">
-                    <input type="text" id="i-b2" placeholder="Non-Striker Name" oninput="pushData()">
-                    <input type="text" id="i-bowl" placeholder="Current Bowler" oninput="pushData()">
-                    <div style="display:flex; gap:10px;">
-                        <input type="number" id="i-target" placeholder="Target" oninput="pushData()">
-                        <button class="btn-action" onclick="toggleInn()">INN 1/2</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <label>Team Squad (11 Players)</label>
-                    <div id="squad-inputs">
-                        <input type="text" class="sq-name" placeholder="Player 1" oninput="updateSquad()">
-                        <input type="text" class="sq-name" placeholder="Player 2" oninput="updateSquad()">
-                        <button onclick="toggleSquad()" class="btn-dark" style="width:100%;">Show More Players...</button>
-                        <div id="extra-squad" class="hidden">
-                             </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top:20px; background: #200;">
-                <button class="btn-danger" onclick="archiveMatch()" style="width:100%; margin-bottom:10px;">💾 END MATCH & SAVE TO HISTORY</button>
-                <button class="btn-danger" onclick="fullReset()" style="width:100%; opacity:0.5;">⚠️ FULL RESET (CLEAN ALL)</button>
-            </div>
-            
-            <div id="history-section" class="card" style="margin-top:20px;">
-                <label>Match History Archives</label>
-                <div id="year-tabs" style="display:flex; gap:10px; margin-bottom:10px;"></div>
-                <div id="history-content"></div>
+            <div class="btn-group">
+                <button class="btn-danger" onclick="outPlayer()">WICKET</button>
+                <button class="btn-dark" onclick="undo()">UNDO</button>
+                <button class="btn-action" onclick="newInning()">NEW INN</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase Config
-        const firebaseConfig = { databaseURL: "Https://myscoreboard-b140f-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref("broadcast_master_v3");
-        const archRef = firebase.database().ref("match_history");
-
-        let state = {
-            r:0, w:0, o:0, b:0, t1:"TEAM A", tour:"TOURNAMENT", 
-            oppN:"OPPONENT", oppS:"0-0 (0.0)", target:0, s:1, bowl:"WAITING",
-            p1:{n:"BATSMAN 1", r:0, b:0}, p2:{n:"BATSMAN 2", r:0, b:0},
-            inn:1, anim:"", squad: Array(11).fill("")
+        // FIREBASE CONFIG (अपनी डिटेल्स यहाँ डालें)
+        const firebaseConfig = {
+            databaseURL: "https://cricket-live-69f88-default-rtdb.firebaseio.com/"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('live_match');
+
+        let state = { r:0, w:0, o:0, b:0, t1:'TEAM', tour:'MATCH', p1:{n:'P1',r:0,b:0}, p2:{n:'P2',r:0,b:0}, bowl:'BOWL', s:1, target:0, inn:1, anim:'' };
+        let history = [];
 
         function initApp() {
-            // Clock
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('d-clock').innerText = now.toLocaleTimeString();
-            }, 1000);
+            db.on('value', (snap) => {
+                state = snap.val() || state;
+                updateUI();
+            });
 
-            // Populate extra squad inputs
-            const extra = document.getElementById('extra-squad');
-            for(let i=3; i<=11; i++) {
-                extra.innerHTML += `<input type="text" class="sq-name" placeholder="Player ${i}" oninput="updateSquad()">`;
+            // Check if already logged in
+            if(localStorage.getItem("admin_login") === "true") {
+                showAdmin();
             }
 
-            // Sync with Firebase
-            db.on('value', snap => {
-                if(snap.val()) {
-                    state = snap.val();
-                    updateUI();
-                }
+            // Enter key for login
+            document.getElementById("pass-input").addEventListener("keypress", (e) => {
+                if (e.key === "Enter") checkAuth();
             });
-            loadHistory();
         }
 
         function checkAuth() {
             if(document.getElementById('pass-input').value === "ChhotuLive8718") {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('login-area').classList.add('hidden');
-            } else alert("Wrong Pin!");
+                localStorage.setItem("admin_login", "true");
+                showAdmin();
+            } else {
+                alert("Wrong Pin!");
+            }
+        }
+
+        function showAdmin() {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.getElementById('login-area').classList.add('hidden');
         }
 
         function lockPanel() {
+            localStorage.removeItem("admin_login");
             document.getElementById('admin-panel').classList.add('hidden');
             document.getElementById('login-area').classList.remove('hidden');
-            document.getElementById('pass-input').value = "";
-        }
-
-        function addRun(v) {
-            state.r += v;
-            if(state.s === 1) { state.p1.r += v; } else { state.p2.r += v; }
-            // Auto strike change for odd runs (except -1)
-            if(v % 2 !== 0 && v !== -1) swapStrike();
-            pushData();
-        }
-
-        function nextBall() {
-            if(state.s === 1) state.p1.b++; else state.p2.b++;
-            state.b++;
-            if(state.b >= 6) { state.o++; state.b = 0; swapStrike(); }
-            pushData();
-        }
-
-        function outPlayer() {
-            let next = prompt("Next Batsman Name:");
-            if(next) {
-                if(state.s === 1) state.p1 = {n:next, r:0, b:0};
-                else state.p2 = {n:next, r:0, b:0};
-                state.w++;
-                nextBall();
-            }
-        }
-
-        function swapStrike() { state.s = state.s === 1 ? 2 : 1; pushData(); }
-
-        function showAnim(txt, r) {
-            state.anim = txt; pushData();
-            addRun(r);
-            setTimeout(() => { state.anim = ""; pushData(); }, 2500);
-        }
-
-        function toggleSquad() { document.getElementById('extra-squad').classList.toggle('hidden'); }
-
-        function updateSquad() {
-            const inputs = document.querySelectorAll('.sq-name');
-            state.squad = Array.from(inputs).map(i => i.value);
-            pushData();
-        }
-
-        function pushData() {
-            // Update state from inputs if admin is open
-            if(!document.getElementById('admin-panel').classList.contains('hidden')) {
-                state.tour = document.getElementById('i-tour').value || state.tour;
-                state.t1 = document.getElementById('i-t1').value || state.t1;
-                state.p1.n = document.getElementById('i-b1').value || state.p1.n;
-                state.p2.n = document.getElementById('i-b2').value || state.p2.n;
-                state.bowl = document.getElementById('i-bowl').value || state.bowl;
-                state.target = parseInt(document.getElementById('i-target').value) || 0;
-            }
-            db.set(state);
         }
 
         function updateUI() {
+            const card = document.getElementById('scoreboard-card');
+            
+            // Runs, Wickets, Overs
             document.getElementById('d-runs').innerText = state.r;
             document.getElementById('d-wkt').innerText = state.w;
             document.getElementById('d-ov').innerText = `${state.o}.${state.b}`;
-            // Projected Score Calculation
-let totalBallsPlayed = (state.o * 6) + state.b;
-if (totalBallsPlayed > 0 && state.inn === 1) {
-    let currentRR = state.r / (totalBallsPlayed / 6);
-    let projectedFinal = Math.round(currentRR * 20); // 20 ओवर के लिए
-    document.getElementById('d-proj').innerText = "PROJECTED SCORE: " + projectedFinal;
-    document.getElementById('proj-container').style.display = "block";
-} else if (state.inn === 2) {
-    // दूसरी पारी में इसे छिपा दें या RRR दिखाएं
-    document.getElementById('proj-container').style.display = "none";
-}
-            
-            document.getElementById('d-team').innerText = state.t1.substring(0,8).toUpperCase();
+            document.getElementById('d-team').innerText = state.t1.toUpperCase();
             document.getElementById('d-tour').innerText = state.tour.toUpperCase();
+            
+            // Players
             document.getElementById('d-b1').innerText = state.p1.n;
             document.getElementById('d-b1-r').innerText = `${state.p1.r}(${state.p1.b})`;
             document.getElementById('d-b2').innerText = state.p2.n;
             document.getElementById('d-b2-r').innerText = `${state.p2.r}(${state.p2.b})`;
-            document.getElementById('d-bowl').innerText = state.bowl.toUpperCase();
+            document.getElementById('d-bowl').innerText = state.bowl;
             document.getElementById('d-target').innerText = state.target;
-
-            
-const mainBoard = document.querySelector('.main-board');
-if (state.anim === "FOUR" || state.anim === "SIX") {
-    mainBoard.classList.add('animate-four-six');
-} else {
-    mainBoard.classList.remove('animate-four-six');
-}
-
-if (state.anim === "WICKET") {
-    mainBoard.classList.add('animate-wicket');
-} else {
-    mainBoard.classList.remove('animate-wicket');
-}
-            
 
             // Striker Highlight
             document.getElementById('p1-row').className = state.s === 1 ? "b-row active-bat" : "b-row";
             document.getElementById('p2-row').className = state.s === 2 ? "b-row active-bat" : "b-row";
 
+            // Projected Score & Win Bar
+            let totalBalls = (state.o * 6) + state.b;
+            let winP1 = 50;
+
+            if (state.inn === 1 && totalBalls > 0) {
+                let prj = Math.round((state.r / totalBalls) * 120);
+                document.getElementById('d-proj').innerText = "PROJECTED: " + prj;
+                document.getElementById('proj-container').style.display = "block";
+                winP1 = Math.min(85, Math.max(15, (state.r / 2) - (state.w * 5)));
+            } else if (state.inn === 2) {
+                document.getElementById('proj-container').style.display = "none";
+                let rem = state.target - state.r;
+                let bLeft = 120 - totalBalls;
+                if(bLeft > 0 && rem > 0) {
+                    let rrr = (rem / (bLeft / 6)).toFixed(1);
+                    document.getElementById('d-equation').innerText = `${rem} RUNS NEEDED IN ${bLeft} BALLS (RRR: ${rrr})`;
+                    winP1 = Math.min(95, Math.max(5, (state.r / state.target) * 100));
+                } else if(rem <= 0) {
+                    document.getElementById('d-equation').innerText = "MATCH FINISHED!";
+                    winP1 = 100;
+                }
+            }
+            document.getElementById('win-p1').style.width = winP1 + "%";
+            document.getElementById('win-p2').style.width = (100 - winP1) + "%";
+
+            // Flash Animations
+            card.classList.remove('animate-four-six', 'animate-wicket');
+            if(state.anim === "FOUR" || state.anim === "SIX") card.classList.add('animate-four-six');
+            if(state.anim === "WICKET") card.classList.add('animate-wicket');
+
             // Dots
             const dots = document.querySelectorAll('.b-dot');
             dots.forEach((d, i) => d.className = i < state.b ? "b-dot active" : "b-dot");
+        }
 
-            // Equation
-            if(state.target > 0) {
-                let rem = state.target - state.r;
-                let balls = (20 * 6) - (state.o * 6 + state.b); // Assuming 20 over match
-                document.getElementById('d-equation').innerText = rem <= 0 ? "MATCH FINISHED" : `${state.t1} NEEDS ${rem} RUNS IN ${balls} BALLS`;
+        function addRun(v, type) {
+            history.push(JSON.parse(JSON.stringify(state)));
+            if(type === 'WD' || type === 'NB') {
+                state.r += v;
             } else {
-                document.getElementById('d-equation').innerText = "1ST INNINGS IN PROGRESS";
+                state.r += v;
+                state.b++;
+                if(state.s === 1) { state.p1.r += v; state.p1.b++; }
+                else { state.p2.r += v; state.p2.b++; }
+                
+                if(v === 4) state.anim = "FOUR";
+                else if(v === 6) state.anim = "SIX";
+                else state.anim = "";
+
+                if(v % 2 !== 0) state.s = state.s === 1 ? 2 : 1;
+                if(state.b === 6) { state.o++; state.b = 0; state.s = state.s === 1 ? 2 : 1; }
             }
-
-            // Anim
-            const animDiv = document.getElementById('boundary-msg');
-            if(state.anim) {
-                animDiv.innerText = state.anim + "!";
-                animDiv.style.display = 'block';
-            } else animDiv.style.display = 'none';
+            pushData();
+            if(v === 4 || v === 6) setTimeout(() => { state.anim = ""; pushData(); }, 3000);
         }
 
-        function archiveMatch() {
-            if(!confirm("End Match and Save to History?")) return;
-            let year = new Date().getFullYear();
-            archRef.child(year).push({
-                match: `${state.t1} vs ${state.oppN}`,
-                score: `${state.r}-${state.w} (${state.o}.${state.b})`,
-                date: new Date().toLocaleDateString(),
-                details: state
-            });
-            fullReset();
+        function outPlayer() {
+            let n = prompt("Next Batsman Name:");
+            if(n) {
+                history.push(JSON.parse(JSON.stringify(state)));
+                state.anim = "WICKET";
+                state.w++;
+                if(state.s === 1) state.p1 = {n:n, r:0, b:0};
+                else state.p2 = {n:n, r:0, b:0};
+                state.b++;
+                if(state.b === 6) { state.o++; state.b = 0; state.s = state.s === 1 ? 2 : 1; }
+                pushData();
+                setTimeout(() => { state.anim = ""; pushData(); }, 3000);
+            }
         }
 
-        function loadHistory() {
-            archRef.on('value', snap => {
-                const data = snap.val();
-                const tabs = document.getElementById('year-tabs');
-                const cont = document.getElementById('history-content');
-                tabs.innerHTML = "";
-                if(!data) return;
-                Object.keys(data).forEach(year => {
-                    tabs.innerHTML += `<button class="btn-dark" onclick="showYear('${year}')">${year}</button>`;
-                });
-            });
+        function newInning() {
+            state.target = state.r + 1;
+            state.r = 0; state.w = 0; state.o = 0; state.b = 0; state.inn = 2;
+            state.p1 = {n:'P1', r:0, b:0}; state.p2 = {n:'P2', r:0, b:0};
+            pushData();
         }
 
-        function showYear(y) {
-    archRef.child(y).on('value', snap => {
-        let html = "<div style='display:grid; gap:10px;'>";
-        if(!snap.val()) {
-            html += "<p style='opacity:0.5'>इस साल कोई रिकॉर्ड नहीं है।</p>";
-        } else {
-            snap.forEach(m => {
-                let d = m.val();
-                let mKey = m.key; // मैच की यूनिक ID
-                html += `
-                    <div style="background:#111; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border-left:3px solid var(--primary);">
-                        <div>
-                            <b style="color:var(--primary)">${d.match}</b><br>
-                            <small>${d.score} | ${d.date}</small>
-                        </div>
-                        <button onclick="deleteMatch('${y}', '${mKey}')" style="background:red; color:white; padding:5px 10px; font-size:12px; width:auto; border-radius:5px;">DELETE</button>
-                    </div>`;
-            });
-        }
-        document.getElementById('history-content').innerHTML = html + "</div>";
-    });
-}
-
-// डिलीट करने का नया फंक्शन
-function deleteMatch(year, key) {
-    if(confirm("क्या आप वाकई इस मैच को हिस्ट्री से हमेशा के लिए हटाना चाहते हैं?")) {
-        archRef.child(year).child(key).remove()
-        .then(() => alert("मैच डिलीट कर दिया गया!"))
-        .catch((error) => alert("Error: " + error));
-    }
-}
-     
+        function pushData() {
+            state.t1 = document.getElementById('inp-t1').value || state.t1;
+            state.tour = document.getElementById('inp-tour').value || state.tour;
+            db.set(state);
         }
 
-        function fullReset() {
-            db.set({
-                r:0, w:0, o:0, b:0, t1:"TEAM A", tour:"TOURNAMENT", 
-                oppN:"OPPONENT", oppS:"0-0 (0.0)", target:0, s:1, bowl:"WAITING",
-                p1:{n:"BATSMAN 1", r:0, b:0}, p2:{n:"BATSMAN 2", r:0, b:0},
-                inn:1, anim:"", squad: Array(11).fill("")
-            });
-            location.reload();
-        }
+        function undo() { if(history.length > 0) { state = history.pop(); db.set(state); } }
     </script>
 </body>
 </html>
