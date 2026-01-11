@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chhotu Pro Scorer + History</title>
+    <title>Chhotu Pro Scorer Ultimate</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
@@ -11,36 +11,38 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Oswald:wght@500;700&display=swap');
         :root { --primary: #fec309; --blue: #1a73e8; --red: #ff0040; --green: #00c853; --bg: #030a16; }
 
-        body { background: var(--bg); color: white; font-family: 'Oswald', sans-serif; margin: 0; padding-bottom: 50px; }
+        body { background: var(--bg); color: white; font-family: 'Oswald', sans-serif; margin: 0; padding-bottom: 50px; overflow-x: hidden; }
         
-        /* Dashboard Header */
-        .master-header { background: #000; padding: 5px 15px; display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 10px; border-bottom: 1px solid #222; }
-        .main-board { background: linear-gradient(90deg, #00122e 0%, #002b6b 100%); display: flex; align-items: center; height: 65px; border-bottom: 3px solid var(--primary); position: relative; }
-        .team-name { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 0 15px; height: 100%; display: flex; align-items: center; clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%); min-width: 80px; }
-        .score-val { font-size: 35px; font-weight: 900; font-family: 'Orbitron'; padding-left: 10px; }
-        .ov-val { font-size: 14px; opacity: 0.6; margin-left: 5px; }
+        /* Top Equation Strip */
+        .equation-strip { background: #000; color: var(--primary); font-family: 'Orbitron'; font-size: 10px; padding: 4px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-weight: bold; }
+
+        /* Main Scoreboard Layout from Image */
+        .main-board { background: linear-gradient(90deg, #00122e 0%, #002b6b 100%); display: flex; align-items: center; height: 70px; border-bottom: 3px solid var(--primary); position: relative; }
+        .team-box { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 0 15px; height: 100%; display: flex; align-items: center; clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%); min-width: 90px; }
+        .score-section { flex-grow: 1; display: flex; align-items: center; padding-left: 10px; }
+        .big-score { font-size: 32px; font-weight: 900; font-family: 'Orbitron'; }
+        .ov-txt { font-size: 14px; opacity: 0.7; margin-left: 8px; font-family: 'Orbitron'; }
         
-        /* Layouts */
+        .players-display { width: 120px; font-size: 11px; font-family: 'Orbitron'; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 10px; }
+        .opp-display { background: rgba(26, 115, 232, 0.2); height: 100%; padding: 5px 15px; text-align: right; min-width: 80px; font-family: 'Orbitron'; }
+
+        /* Admin Layout */
         .admin-container { padding: 15px; max-width: 1000px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: #0a1221; padding: 15px; border-radius: 8px; border: 1px solid #1a2a44; }
         
-        /* Buttons */
+        /* Buttons Style */
         .btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-        button { padding: 12px 5px; border-radius: 4px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+        button { padding: 12px 5px; border-radius: 4px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 10px; }
         .btn-b { background: var(--blue); color: #fff; }
         .btn-r { background: var(--red); color: #fff; }
         .btn-y { background: var(--primary); color: #000; }
         .btn-g { background: var(--green); color: #fff; width: 100%; margin-bottom: 8px; }
-        .btn-dark { background: #1c2533; color: white; width: 100%; border: 1px solid #333; margin-bottom: 8px; }
-
-        input { width: 92%; padding: 10px; margin-bottom: 8px; background: #050e1a; border: 1px solid #1a2a44; color: #fff; border-radius: 4px; }
         
-        /* History Section */
-        .history-panel { margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
-        .history-item { background: #0a1221; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid var(--primary); }
+        input { width: 94%; padding: 8px; margin-bottom: 8px; background: #050e1a; border: 1px solid #1a2a44; color: #fff; border-radius: 4px; font-size: 12px; }
+        .history-item { background: #0a1221; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid var(--primary); font-size: 13px; }
         
-        #alert-box { position: fixed; top: 40%; width: 100%; text-align: center; font-size: 50px; font-family: 'Orbitron'; font-weight: 900; display: none; z-index: 5000; }
+        #alert-box { position: fixed; top: 40%; width: 100%; text-align: center; font-size: 40px; font-family: 'Orbitron'; font-weight: 900; display: none; z-index: 9999; text-shadow: 2px 2px #000; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -48,33 +50,39 @@
 
     <div id="alert-box"></div>
 
-    <div class="master-header">
-        <span id="d-tour">TOURNAMENT</span>
-        <span id="d-clock">00:00 PM</span>
+    <div class="equation-strip">
+        <span id="d-msg">WELCOME TO THE MATCH</span>
+        <span id="d-crr">CRR: 0.00</span>
     </div>
 
     <div class="main-board">
-        <div class="team-name" id="d-t1">TEAM</div>
-        <div class="score-val">
-            <span id="d-r">0</span>-<span id="d-w">0</span>
-            <span class="ov-val">(<span id="d-ov">0.0</span>)</span>
+        <div class="team-box" id="d-t1">TEAM A</div>
+        <div class="score-section">
+            <span class="big-score"><span id="d-r">0</span>-<span id="d-w">0</span></span>
+            <span class="ov-txt">(<span id="d-ov">0.0</span>)</span>
         </div>
-        <div style="flex-grow:1; padding: 0 15px; font-size: 12px; font-family: 'Orbitron';">
+        <div class="players-display">
             <div id="p1-row" style="color:var(--primary)"> <span id="d-p1">BAT 1</span> <span id="d-p1r">0(0)</span></div>
             <div id="p2-row"> <span id="d-p2">BAT 2</span> <span id="d-p2r">0(0)</span></div>
+        </div>
+        <div class="opp-display">
+            <div style="font-size: 8px; opacity: 0.6;">OPPONENT</div>
+            <div id="d-opp-s" style="font-size: 12px; font-weight: bold;">0-0 (0)</div>
+            <div style="font-size: 8px; opacity: 0.6; margin-top: 4px;">TARGET</div>
+            <div id="d-tgt-v" style="font-size: 12px; color: var(--primary);">0</div>
         </div>
     </div>
 
     <div class="admin-container">
-        <div id="login-view" style="text-align: center; padding: 50px;">
+        <div id="login-view" style="text-align: center; padding: 40px;">
             <input type="password" id="pin" placeholder="ENTER PIN" style="text-align: center; font-size: 20px;">
-            <button class="btn-y" onclick="login()" style="width:100%">UNLOCK DASHBOARD</button>
+            <button class="btn-y" onclick="login()" style="width:100%">UNLOCK ADMIN</button>
         </div>
 
         <div id="admin-view" class="hidden">
             <div class="grid">
                 <div class="card">
-                    <p style="font-size: 10px; color: #555; margin:0 0 10px 0;">QUICK SCORING</p>
+                    <p style="font-size: 10px; color: #555; margin:0 0 10px 0;">SCORING CONTROLS</p>
                     <div class="btn-group">
                         <button class="btn-b" onclick="score(1)">+1</button>
                         <button class="btn-b" onclick="score(2)">+2</button>
@@ -93,22 +101,23 @@
                         <button class="btn-b" onclick="swap()">SWAP</button>
                     </div>
                     <button class="btn-g" onclick="dotBall()">NEXT BALL (DOT)</button>
-                    <button class="btn-dark" onclick="toggleAuto()" id="auto-btn">AUTO STRIKE: ON</button>
-                    <button class="btn-r" onclick="saveMatch()" style="width:100%">END & SAVE MATCH</button>
+                    <button class="btn-y" onclick="toggleInn()" id="inn-btn" style="width:100%; margin-bottom:8px;">INN: 1ST</button>
+                    <button class="btn-r" onclick="saveMatch()" style="width:100%">RESET & SAVE</button>
                 </div>
 
                 <div class="card">
-                    <p style="font-size: 10px; color: #555; margin:0 0 10px 0;">MATCH SETUP</p>
-                    <input type="text" id="i-tour" placeholder="Tournament Name" oninput="sync()">
-                    <input type="text" id="i-t1" placeholder="Batting Team" oninput="sync()">
-                    <input type="text" id="i-p1" placeholder="Striker" oninput="sync()">
-                    <input type="text" id="i-p2" placeholder="Non-Striker" oninput="sync()">
-                    <input type="text" id="i-bwl" placeholder="Current Bowler" oninput="sync()">
+                    <p style="font-size: 10px; color: #555; margin:0 0 10px 0;">MATCH SETTINGS</p>
+                    <input type="text" id="i-t1" placeholder="Batting Team Name" oninput="sync()">
+                    <input type="text" id="i-p1" placeholder="Striker Name" oninput="sync()">
+                    <input type="text" id="i-p2" placeholder="Non-Striker Name" oninput="sync()">
+                    <input type="number" id="i-tgt" placeholder="Target Score (e.g. 150)" oninput="sync()">
+                    <input type="text" id="i-opp" placeholder="Opponent Score (e.g. 149-2)" oninput="sync()">
+                    <input type="number" id="i-maxo" placeholder="Total Match Overs (e.g. 20)" oninput="sync()">
                 </div>
             </div>
 
-            <div class="history-panel">
-                <h3 style="color:var(--primary); font-family:'Orbitron'; font-size:14px;">MATCH HISTORY ARCHIVE</h3>
+            <div style="margin-top: 20px;">
+                <h4 style="color:var(--primary); font-family:'Orbitron';">MATCH HISTORY</h4>
                 <div id="history-list"></div>
             </div>
         </div>
@@ -117,75 +126,92 @@
     <script>
         const firebaseConfig = { databaseURL: "Https://myscoreboard-b140f-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref("live_match_v4");
+        const db = firebase.database().ref("live_match_v5");
         const histDb = firebase.database().ref("match_history");
 
-        let state = { r:0, w:0, o:0, b:0, t:"TEAM", tour:"TOURNAMENT", p1:{n:"BAT 1", r:0, b:0}, p2:{n:"BAT 2", r:0, b:0}, s:1, auto:true, bwl:"WAITING", freeHit:false };
+        let st = { 
+            r:0, w:0, o:0, b:0, t1:"TEAM A", p1:{n:"BAT 1", r:0, b:0}, p2:{n:"BAT 2", r:0, b:0}, 
+            s:1, tgt:0, opp:"0-0", inn:1, maxo:20, fh:false 
+        };
 
         function login() { if(document.getElementById('pin').value === "ChhotuLive8718") { localStorage.setItem("admin", "true"); location.reload(); } }
+        
         function initApp() {
             if(localStorage.getItem("admin") === "true") { document.getElementById('login-view').classList.add('hidden'); document.getElementById('admin-view').classList.remove('hidden'); }
-            db.on('value', snap => { if(snap.val()) { state = snap.val(); updateUI(); } });
+            db.on('value', snap => { if(snap.val()) { st = snap.val(); updateUI(); } });
             loadHistory();
-            setInterval(() => { document.getElementById('d-clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
         }
 
-        function score(v) { 
+        function score(v) {
             if(v > 0) {
-                state.r += v; if(state.s === 1) state.p1.r += v; else state.p2.r += v;
+                st.r += v; if(st.s === 1) st.p1.r += v; else st.p2.r += v;
                 if(v === 4) showAlert("FOUR", "#fec309"); if(v === 6) showAlert("SIX", "#fec309");
-                if(state.auto && (v === 1 || v === 3)) swap();
-            } else { state.r = Math.max(0, state.r - 1); }
-            state.freeHit = false; db.set(state); 
+                if(v === 1 || v === 3) swap();
+            } else { st.r = Math.max(0, st.r - 1); }
+            st.fh = false; db.set(st);
         }
 
-        function extra(type) { 
-            state.r += 1; if(type === 'NB') { state.freeHit = true; showAlert("FREE HIT", "#ff0040"); } 
-            db.set(state); 
+        function extra(type) { st.r += 1; if(type === 'NB') { st.fh = true; showAlert("FREE HIT", "#ff0040"); } db.set(st); }
+
+        function dotBall() {
+            if(st.s === 1) st.p1.b++; else st.p2.b++; st.b++;
+            if(st.b >= 6) { st.o++; st.b = 0; swap(); }
+            st.fh = false; db.set(st);
         }
 
-        function dotBall() { 
-            if(state.s === 1) state.p1.b++; else state.p2.b++; state.b++;
-            if(state.b >= 6) { state.o++; state.b = 0; if(state.auto) swap(); }
-            state.freeHit = false; db.set(state); 
+        function wicket() {
+            if(st.fh) return alert("FREE HIT! NOT OUT");
+            let n = prompt("NEW BATSMAN NAME:");
+            if(n) { st.w++; if(st.s === 1) st.p1 = {n:n, r:0, b:0}; else st.p2 = {n:n, r:0, b:0}; db.set(st); }
         }
 
-        function wicket() { 
-            if(state.freeHit) return alert("FREE HIT!");
-            let n = prompt("NEW BATSMAN:");
-            if(n) { state.w++; if(state.s === 1) state.p1 = {n:n, r:0, b:0}; else state.p2 = {n:n, r:0, b:0}; db.set(state); }
-        }
-
-        function swap() { state.s = state.s === 1 ? 2 : 1; db.set(state); }
-        function toggleAuto() { state.auto = !state.auto; db.set(state); }
+        function swap() { st.s = st.s === 1 ? 2 : 1; db.set(st); }
+        function toggleInn() { st.inn = st.inn === 1 ? 2 : 1; db.set(st); }
 
         function sync() {
-            state.tour = document.getElementById('i-tour').value || state.tour;
-            state.t = document.getElementById('i-t1').value || state.t;
-            state.p1.n = document.getElementById('i-p1').value || state.p1.n;
-            state.p2.n = document.getElementById('i-p2').value || state.p2.n;
-            state.bwl = document.getElementById('i-bwl').value || state.bwl;
-            db.set(state);
+            st.t1 = document.getElementById('i-t1').value || st.t1;
+            st.p1.n = document.getElementById('i-p1').value || st.p1.n;
+            st.p2.n = document.getElementById('i-p2').value || st.p2.n;
+            st.tgt = parseInt(document.getElementById('i-tgt').value) || 0;
+            st.opp = document.getElementById('i-opp').value || "0-0";
+            st.maxo = parseInt(document.getElementById('i-maxo').value) || 20;
+            db.set(st);
         }
 
         function updateUI() {
-            document.getElementById('d-r').innerText = state.r; document.getElementById('d-w').innerText = state.w;
-            document.getElementById('d-ov').innerText = `${state.o}.${state.b}`;
-            document.getElementById('d-t1').innerText = state.t; document.getElementById('d-p1').innerText = state.p1.n;
-            document.getElementById('d-p1r').innerText = `${state.p1.r}(${state.p1.b})`;
-            document.getElementById('d-p2').innerText = state.p2.n;
-            document.getElementById('d-p2r').innerText = `${state.p2.r}(${state.p2.b})`;
-            document.getElementById('p1-row').style.color = state.s === 1 ? "var(--primary)" : "white";
-            document.getElementById('p2-row').style.color = state.s === 2 ? "var(--primary)" : "white";
-            document.getElementById('auto-btn').innerText = state.auto ? "AUTO STRIKE: ON" : "AUTO STRIKE: OFF";
+            document.getElementById('d-r').innerText = st.r; document.getElementById('d-w').innerText = st.w;
+            document.getElementById('d-ov').innerText = `${st.o}.${st.b}`;
+            document.getElementById('d-t1').innerText = st.t1;
+            document.getElementById('d-p1').innerText = st.p1.n; document.getElementById('d-p1r').innerText = `${st.p1.r}(${st.p1.b})`;
+            document.getElementById('d-p2').innerText = st.p2.n; document.getElementById('d-p2r').innerText = `${st.p2.r}(${st.p2.b})`;
+            document.getElementById('d-opp-s').innerText = st.opp; document.getElementById('d-tgt-v').innerText = st.tgt;
+            document.getElementById('inn-btn').innerText = `INN: ${st.inn === 1 ? '1ST' : '2ND'}`;
+            
+            // Equation Logic
+            let totalBalls = st.maxo * 6;
+            let bowledBalls = (st.o * 6) + st.b;
+            let leftBalls = totalBalls - bowledBalls;
+            let runsNeeded = st.tgt - st.r;
+
+            if(st.inn === 2 && st.tgt > 0) {
+                document.getElementById('d-msg').innerText = `NEED ${runsNeeded} RUNS IN ${leftBalls} BALLS`;
+            } else {
+                document.getElementById('d-msg').innerText = "1ST INNINGS IN PROGRESS";
+            }
+
+            let crr = (st.r / ((st.o * 6 + st.b) / 6 || 1)).toFixed(2);
+            document.getElementById('d-crr').innerText = `CRR: ${crr}`;
+            
+            document.getElementById('p1-row').style.color = st.s === 1 ? "var(--primary)" : "white";
+            document.getElementById('p2-row').style.color = st.s === 2 ? "var(--primary)" : "white";
         }
 
         function showAlert(t, c) { const b = document.getElementById('alert-box'); b.innerText = t; b.style.color = c; b.style.display = 'block'; setTimeout(() => b.style.display='none', 2000); }
 
         function saveMatch() {
-            if(confirm("SAVE THIS MATCH TO HISTORY?")) {
-                histDb.push({ tour: state.tour, teams: state.t, score: `${state.r}/${state.w}`, overs: `${state.o}.${state.b}`, date: new Date().toLocaleDateString() });
-                db.set({ r:0, w:0, o:0, b:0, t:"TEAM", tour:"TOURNAMENT", p1:{n:"BAT 1", r:0, b:0}, p2:{n:"BAT 2", r:0, b:0}, s:1, auto:true, bwl:"WAITING", freeHit:false });
+            if(confirm("SAVE MATCH?")) {
+                histDb.push({ team: st.t1, score: `${st.r}/${st.w}`, overs: `${st.o}.${st.b}`, date: new Date().toLocaleDateString() });
+                db.set({ r:0, w:0, o:0, b:0, t1:"TEAM A", p1:{n:"BAT 1", r:0, b:0}, p2:{n:"BAT 2", r:0, b:0}, s:1, tgt:0, opp:"0-0", inn:1, maxo:20, fh:false });
             }
         }
 
@@ -194,7 +220,7 @@
                 const list = document.getElementById('history-list'); list.innerHTML = "";
                 const data = snap.val(); if(!data) return;
                 Object.values(data).reverse().forEach(m => {
-                    list.innerHTML += `<div class="history-item"><strong>${m.teams}</strong>: ${m.score} (${m.overs}) <br> <small>${m.date} - ${m.tour}</small></div>`;
+                    list.innerHTML += `<div class="history-item">${m.team}: ${m.score} (${m.overs}) - ${m.date}</div>`;
                 });
             });
         }
