@@ -14,47 +14,22 @@
 
         body { background: var(--bg); color: white; font-family: 'Oswald', sans-serif; margin: 0; padding-bottom: 50px; }
 
-        /* --- FLASH ANIMATIONS --- */
         @keyframes flash-yellow { 0% { background: #00122e; } 50% { background: #fec309; } 100% { background: #00122e; } }
         @keyframes flash-red { 0% { background: #00122e; } 50% { background: #ff0040; } 100% { background: #00122e; } }
         .animate-four-six { animation: flash-yellow 0.5s ease 3; }
         .animate-wicket { animation: flash-red 0.5s ease 3; }
 
-        /* --- PREMIUM BROADCAST SCOREBOARD --- */
-        .master-container { width: 100%; max-width: 1000px; margin: auto; position: sticky; top: 0; z-index: 1000; background: var(--bg); transition: 0.3s; }
-        
-        .top-status-bar { 
-            background: #000; display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 20px; font-size: 12px; font-family: 'Orbitron'; border-bottom: 1px solid #222;
-        }
+        .master-container { width: 100%; max-width: 1000px; margin: auto; position: sticky; top: 0; z-index: 1000; background: var(--bg); border-bottom: 2px solid #222; }
+        .top-status-bar { background: #000; display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; font-size: 12px; font-family: 'Orbitron'; border-bottom: 1px solid #222; }
 
         .win-bar-container { height: 6px; background: #111; position: relative; display: flex; overflow: hidden; }
         #win-p1 { background: var(--neon-blue); height: 100%; transition: 1s; box-shadow: 0 0 10px var(--neon-blue); }
         #win-p2 { background: var(--neon-red); height: 100%; transition: 1s; box-shadow: 0 0 10px var(--neon-red); }
 
-        .main-board { 
-            height: 70px; background: linear-gradient(90deg, #00122e 0%, #002b6b 100%);
-            display: flex; align-items: center; position: relative; overflow: hidden;
-            border-bottom: 3px solid var(--primary);
-        }
-
-        .team-tag { 
-            background: var(--primary); color: #000; font-weight: 900; font-size: 22px;
-            padding: 0 25px; height: 100%; display: flex; align-items: center;
-            clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%); font-family: 'Orbitron';
-        }
-
+        .main-board { height: 70px; background: linear-gradient(90deg, #00122e 0%, #002b6b 100%); display: flex; align-items: center; position: relative; overflow: hidden; border-bottom: 3px solid var(--primary); }
+        .team-tag { background: var(--primary); color: #000; font-weight: 900; font-size: 22px; padding: 0 25px; height: 100%; display: flex; align-items: center; clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%); font-family: 'Orbitron'; }
         .live-score { font-size: 42px; font-weight: 900; padding: 0 15px; font-family: 'Orbitron'; letter-spacing: -2px; }
-        
-        /* --- OVER SPACING FIXED HERE --- */
-        .overs-small { 
-            font-size: 18px; 
-            opacity: 0.8; 
-            color: #ccc; 
-            margin-left: 15px; 
-            letter-spacing: 2px; 
-            font-weight: bold;
-        }
+        .overs-small { font-size: 18px; opacity: 0.8; color: #ccc; margin-left: 15px; letter-spacing: 2px; font-weight: bold; }
 
         .batsmen-section { flex-grow: 1; padding: 0 20px; border-left: 1px solid rgba(255,255,255,0.1); }
         .b-row { font-size: 18px; display: flex; justify-content: space-between; margin: 2px 0; }
@@ -63,14 +38,18 @@
         .opp-box { background: rgba(255,255,255,0.05); height: 100%; padding: 0 15px; display: flex; flex-direction: column; justify-content: center; text-align: center; min-width: 120px; border-left: 1px solid #333; }
         .target-label { font-size: 10px; color: var(--primary); letter-spacing: 1px; }
 
-        .bottom-strip { 
-            background: #000; padding: 5px 15px; display: flex; justify-content: space-between; 
-            align-items: center; font-size: 13px; font-weight: 700;
-        }
-
+        .bottom-strip { background: #000; padding: 5px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; }
         .ball-tracker { display: flex; gap: 5px; }
         .b-dot { width: 22px; height: 22px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; border: 1px solid #444; }
         .b-dot.active { background: var(--primary); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--primary); }
+
+        /* --- HISTORY STYLES --- */
+        .history-btn-nav { background: #111; padding: 10px; text-align: center; border-bottom: 1px solid #333; }
+        .history-panel { max-width: 900px; margin: 20px auto; padding: 15px; display: none; }
+        .history-item { background: #0a1221; padding: 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border-left: 5px solid var(--primary); }
+        .history-item:hover { background: #131e33; }
+        .history-details { background: #000; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #333; }
+        .player-stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #222; font-size: 14px; }
 
         /* --- ADMIN PANEL --- */
         .admin-section { padding: 20px; max-width: 900px; margin: auto; }
@@ -79,20 +58,13 @@
         .card { background: #0a1221; padding: 20px; border-radius: 12px; border: 1px solid #1a2a44; }
         .btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         button { padding: 12px; font-weight: 900; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: 'Oswald'; }
-        button:active { transform: scale(0.95); }
         .btn-run { background: #1a73e8; color: white; }
         .btn-action { background: var(--primary); color: #000; }
         .btn-danger { background: var(--neon-red); color: white; }
-        .btn-dark { background: #333; color: #fff; }
-        input { width: 93%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; font-size: 14px; }
-        label { font-size: 12px; color: var(--primary); display: block; margin-bottom: 5px; text-transform: uppercase; }
-
-        #boundary-msg { 
-            position: fixed; top: 30%; left: 0; width: 100%; background: var(--primary); color: #000;
-            font-size: 70px; font-weight: 900; text-align: center; padding: 20px 0; display: none; z-index: 2000;
-            font-family: 'Orbitron'; animation: zoomIn 0.4s;
-        }
-        @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
+        input { width: 93%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; }
+        label { font-size: 12px; color: var(--primary); display: block; margin-bottom: 5px; }
+        
+        #boundary-msg { position: fixed; top: 30%; left: 0; width: 100%; background: var(--primary); color: #000; font-size: 70px; font-weight: 900; text-align: center; padding: 20px 0; display: none; z-index: 2000; font-family: 'Orbitron'; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -105,10 +77,6 @@
             <span><span id="d-tour">TOURNAMENT</span> | <span id="d-proj" style="color:var(--primary)"></span></span>
             <span id="d-clock">00:00:00</span>
         </div>
-        <div class="win-bar-container">
-            <div id="win-p1" style="width: 50%;"></div>
-            <div id="win-p2" style="width: 50%;"></div>
-        </div>
         <div class="main-board">
             <div class="team-tag" id="d-team">TEAM A</div>
             <div class="live-score">
@@ -116,31 +84,24 @@
                 <span class="overs-small">(<span id="d-ov">0 . 0</span>)</span>
             </div>
             <div class="batsmen-section">
-                <div id="p1-row" class="b-row active-bat">
-                    <span id="d-b1">BATSMAN 1</span> <span id="d-b1-r">0(0)</span>
-                </div>
-                <div id="p2-row" class="b-row">
-                    <span id="d-b2">BATSMAN 2</span> <span id="d-b2-r">0(0)</span>
-                </div>
-            </div>
-            <div class="opp-box">
-                <span id="d-opp-name" style="font-size: 12px; opacity: 0.6;">OPPONENT</span>
-                <span id="d-opp-score" style="font-size: 18px; font-weight: 900;">0-0 (0.0)</span>
-                <span class="target-label">TARGET: <span id="d-target">0</span></span>
-            </div>
-        </div>
-        <div class="bottom-strip">
-            <span id="d-equation">1ST INNINGS IN PROGRESS</span>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span>BOWLER: <span id="d-bowl" style="color:var(--primary)">WAITING</span></span>
-                <div class="ball-tracker" id="d-dots">
-                    <div class="b-dot">1</div><div class="b-dot">2</div><div class="b-dot">3</div><div class="b-dot">4</div><div class="b-dot">5</div><div class="b-dot">6</div>
-                </div>
+                <div id="p1-row" class="b-row active-bat"><span id="d-b1">BATSMAN 1</span> <span id="d-b1-r">0(0)</span></div>
+                <div id="p2-row" class="b-row"><span id="d-b2">BATSMAN 2</span> <span id="d-b2-r">0(0)</span></div>
             </div>
         </div>
     </div>
 
-    <div class="admin-section">
+    <div class="history-btn-nav">
+        <button class="btn-action" onclick="toggleHistory()">📖 VIEW MATCH HISTORY</button>
+        <button class="btn-run" onclick="location.reload()">🔄 LIVE SCORE</button>
+    </div>
+
+    <div id="history-panel" class="history-panel">
+        <h2 style="color:var(--primary); text-align: center;">MATCH RESULTS ARCHIVE</h2>
+        <div id="history-list">
+            </div>
+    </div>
+
+    <div class="admin-section" id="admin-main-view">
         <div id="login-area" class="login-card">
             <h1 style="color:var(--primary); font-family: 'Orbitron';">🛡️ ADMIN ACCESS</h1>
             <input type="password" id="pass-input" placeholder="ENTER SECURE PIN" style="text-align:center; font-size: 24px;">
@@ -150,7 +111,7 @@
         <div id="admin-panel" class="hidden">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color:var(--primary)">CONTROL DASHBOARD</h2>
-                <button class="btn-danger" onclick="lockPanel()">🔒 LOCK & EXIT</button>
+                <button class="btn-danger" onclick="lockPanel()">🔒 LOCK</button>
             </div>
 
             <div class="control-grid">
@@ -159,29 +120,20 @@
                     <div class="btn-group">
                         <button class="btn-run" onclick="addRun(1)">+1</button>
                         <button class="btn-run" onclick="addRun(2)">+2</button>
-                        <button class="btn-run" onclick="addRun(3)">+3</button>
-                        <button class="btn-danger" onclick="addRun(-1)">-1</button>
+                        <button class="btn-run" onclick="addRun(4)">4</button>
+                        <button class="btn-run" onclick="addRun(6)">6</button>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn-action" onclick="addRun(4)">4</button>
-                        <button class="btn-action" onclick="addRun(6)">6</button>
-                        <button class="btn-danger" onclick="outPlayer()" style="grid-column: span 2;">WICKET</button>
-                    </div>
-                    <button class="btn-run" onclick="nextBall()" style="width:100%; background:#00c853;">NEXT BALL (DOT)</button>
-                    <button class="btn-dark" onclick="swapStrike()" style="width:100%; margin-top:10px;">🔄 SWAP STRIKER</button>
+                    <button class="btn-danger" onclick="outPlayer()" style="width:100%; margin-bottom:10px;">WICKET</button>
+                    <button class="btn-run" onclick="nextBall()" style="width:100%; background:#00c853;">NEXT BALL</button>
+                    <button class="btn-action" onclick="archiveMatch()" style="width:100%; margin-top:20px; background:#f44336; color:white;">💾 SAVE MATCH TO HISTORY</button>
                 </div>
 
                 <div class="card">
                     <label>Match Setup</label>
-                    <input type="text" id="i-tour" placeholder="Tournament Name" oninput="pushData()">
-                    <input type="text" id="i-t1" placeholder="Batting Team Name" oninput="pushData()">
+                    <input type="text" id="i-t1" placeholder="Batting Team" oninput="pushData()">
+                    <input type="text" id="i-opp" placeholder="Opponent Team" oninput="pushData()">
                     <input type="text" id="i-b1" placeholder="Striker Name" oninput="pushData()">
                     <input type="text" id="i-b2" placeholder="Non-Striker Name" oninput="pushData()">
-                    <input type="text" id="i-bowl" placeholder="Current Bowler" oninput="pushData()">
-                    <div style="display:flex; gap:10px;">
-                        <input type="number" id="i-target" placeholder="Target" oninput="pushData()">
-                        <button class="btn-action" onclick="toggleInn()">INN 1/2</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -191,20 +143,20 @@
         const firebaseConfig = { databaseURL: "Https://myscoreboard-b140f-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref("broadcast_master_v3");
+        const histDb = firebase.database().ref("match_history");
 
         let state = {
-            r:0, w:0, o:0, b:0, t1:"TEAM A", tour:"TOURNAMENT", 
-            oppN:"OPPONENT", oppS:"0-0 (0.0)", target:0, s:1, bowl:"WAITING",
+            r:0, w:0, o:0, b:0, t1:"TEAM A", oppN:"OPPONENT",
             p1:{n:"BATSMAN 1", r:0, b:0}, p2:{n:"BATSMAN 2", r:0, b:0},
-            inn:1, anim:"", squad: Array(11).fill("")
+            s:1, tour:"TOURNAMENT", anim:"",
+            allPlayers: [] // For history
         };
 
         function checkAuth() {
-            const inputPin = document.getElementById('pass-input').value;
-            if(inputPin === "ChhotuLive8718") {
+            if(document.getElementById('pass-input').value === "ChhotuLive8718") {
                 localStorage.setItem("admin_login", "true");
                 showAdmin();
-            } else { alert("गलत पिन!"); }
+            } else { alert("Wrong PIN!"); }
         }
 
         function showAdmin() {
@@ -214,35 +166,21 @@
 
         function lockPanel() {
             localStorage.removeItem("admin_login");
-            document.getElementById('admin-panel').classList.add('hidden');
-            document.getElementById('login-area').classList.remove('hidden');
-            document.getElementById('pass-input').value = "";
+            location.reload();
         }
 
         function initApp() {
             if(localStorage.getItem("admin_login") === "true") showAdmin();
-            document.getElementById("pass-input").addEventListener("keypress", (e) => { if (e.key === "Enter") checkAuth(); });
-
-            setInterval(() => {
-                document.getElementById('d-clock').innerText = new Date().toLocaleTimeString();
-            }, 1000);
-
-            db.on('value', snap => {
-                if(snap.val()) { state = snap.val(); updateUI(); }
-            });
+            setInterval(() => { document.getElementById('d-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+            db.on('value', snap => { if(snap.val()) { state = snap.val(); updateUI(); } });
+            loadHistory();
         }
 
         function addRun(v) {
             state.r += v;
-            if(v === 4) state.anim = "FOUR";
-            else if(v === 6) state.anim = "SIX";
-            else state.anim = "";
-            
             if(state.s === 1) state.p1.r += v; else state.p2.r += v;
-            if(v % 2 !== 0 && v !== -1) swapStrike();
-            
+            if(v % 2 !== 0) swapStrike();
             pushData();
-            if(v === 4 || v === 6) setTimeout(() => { state.anim = ""; pushData(); }, 3000);
         }
 
         function nextBall() {
@@ -253,27 +191,27 @@
         }
 
         function outPlayer() {
-            let n = prompt("Next Batsman:");
+            let n = prompt("Next Batsman Name:");
             if(n) {
-                state.anim = "WICKET";
+                // Save current batsman to historical list before replacing
+                let finishedPlayer = state.s === 1 ? {...state.p1} : {...state.p2};
+                if(!state.allPlayers) state.allPlayers = [];
+                state.allPlayers.push(finishedPlayer);
+                
                 state.w++;
                 if(state.s === 1) state.p1 = {n:n, r:0, b:0}; else state.p2 = {n:n, r:0, b:0};
                 pushData();
-                setTimeout(() => { state.anim = ""; pushData(); }, 3000);
             }
         }
 
         function swapStrike() { state.s = state.s === 1 ? 2 : 1; pushData(); }
-        function toggleInn() { state.inn = state.inn === 1 ? 2 : 1; pushData(); }
 
         function pushData() {
             if(!document.getElementById('admin-panel').classList.contains('hidden')) {
-                state.tour = document.getElementById('i-tour').value || state.tour;
                 state.t1 = document.getElementById('i-t1').value || state.t1;
+                state.oppN = document.getElementById('i-opp').value || state.oppN;
                 state.p1.n = document.getElementById('i-b1').value || state.p1.n;
                 state.p2.n = document.getElementById('i-b2').value || state.p2.n;
-                state.bowl = document.getElementById('i-bowl').value || state.bowl;
-                state.target = parseInt(document.getElementById('i-target').value) || 0;
             }
             db.set(state);
         }
@@ -281,50 +219,79 @@
         function updateUI() {
             document.getElementById('d-runs').innerText = state.r;
             document.getElementById('d-wkt').innerText = state.w;
-            
-            /* --- OVER LOGIC UPDATED FOR BETTER SPACING --- */
             document.getElementById('d-ov').innerText = state.o + " . " + state.b;
-
             document.getElementById('d-team').innerText = state.t1.toUpperCase();
-            document.getElementById('d-tour').innerText = state.tour.toUpperCase();
             document.getElementById('d-b1').innerText = state.p1.n;
             document.getElementById('d-b1-r').innerText = `${state.p1.r}(${state.p1.b})`;
             document.getElementById('d-b2').innerText = state.p2.n;
             document.getElementById('d-b2-r').innerText = `${state.p2.r}(${state.p2.b})`;
-            document.getElementById('d-bowl').innerText = state.bowl.toUpperCase();
-            document.getElementById('d-target').innerText = state.target;
-
-            let totalBalls = (state.o * 6) + state.b;
-            if (state.inn === 1 && totalBalls > 0) {
-                let prj = Math.round((state.r / totalBalls) * 120);
-                document.getElementById('d-proj').innerText = "PROJECTED: " + prj;
-            } else { document.getElementById('d-proj').innerText = ""; }
-
-            let winP1 = 50; 
-            if (state.target > 0) {
-                winP1 = Math.min(95, Math.max(5, (state.r / state.target) * 100));
-            }
-            document.getElementById('win-p1').style.width = winP1 + "%";
-            document.getElementById('win-p2').style.width = (100 - winP1) + "%";
-
-            const mainBoard = document.querySelector('.master-container'); 
-            mainBoard.classList.remove('animate-four-six', 'animate-wicket');
-            
-            const animDiv = document.getElementById('boundary-msg');
-            if(state.anim) {
-                animDiv.innerText = state.anim + "!";
-                animDiv.style.display = 'block';
-                if (state.anim === "FOUR" || state.anim === "SIX") mainBoard.classList.add('animate-four-six');
-                if (state.anim === "WICKET") mainBoard.classList.add('animate-wicket');
-            } else {
-                animDiv.style.display = 'none';
-            }
-
             document.getElementById('p1-row').className = state.s === 1 ? "b-row active-bat" : "b-row";
             document.getElementById('p2-row').className = state.s === 2 ? "b-row active-bat" : "b-row";
+        }
+
+        // --- HISTORY LOGIC ---
+        function archiveMatch() {
+            if(!confirm("Are you sure you want to end this match and save to history?")) return;
             
-            const dots = document.querySelectorAll('.b-dot');
-            dots.forEach((d, i) => d.className = i < state.b ? "b-dot active" : "b-dot");
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            // Add current players to the final list
+            let finalPlayers = state.allPlayers ? [...state.allPlayers] : [];
+            finalPlayers.push(state.p1);
+            finalPlayers.push(state.p2);
+
+            const matchData = {
+                teams: `${state.t1} vs ${state.oppN}`,
+                score: `${state.r}-${state.w} (${state.o}.${state.b})`,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                day: days[now.getDay()],
+                players: finalPlayers
+            };
+
+            histDb.push(matchData).then(() => {
+                alert("Match Saved Successfully!");
+                db.set({ r:0, w:0, o:0, b:0, t1:"TEAM A", oppN:"OPPONENT", p1:{n:"BATSMAN 1", r:0, b:0}, p2:{n:"BATSMAN 2", r:0, b:0}, s:1, tour:"TOURNAMENT", allPlayers: [] });
+                location.reload();
+            });
+        }
+
+        function loadHistory() {
+            histDb.on('value', snap => {
+                const list = document.getElementById('history-list');
+                list.innerHTML = "";
+                const data = snap.val();
+                if(!data) { list.innerHTML = "<p>No matches found.</p>"; return; }
+
+                Object.keys(data).reverse().forEach((key, index) => {
+                    const m = data[key];
+                    let playerHtml = m.players.map(p => `
+                        <div class="player-stat"><span>${p.n}</span> <span>${p.r} Runs (${p.b} Balls)</span></div>
+                    `).join('');
+
+                    list.innerHTML += `
+                        <div class="history-item" onclick="document.getElementById('det-${key}').style.display = document.getElementById('det-${key}').style.display === 'block' ? 'none' : 'block'">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${index + 1}. ${m.teams}</strong>
+                                <span style="color:var(--primary)">${m.score}</span>
+                            </div>
+                            <div style="font-size:11px; opacity:0.6; margin-top:5px;">${m.day} | ${m.date} | ${m.time}</div>
+                            
+                            <div id="det-${key}" class="history-details">
+                                <h4 style="margin:0 0 10px 0; color:var(--neon-blue); border-bottom:1px solid #333;">FULL SCORECARD</h4>
+                                ${playerHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function toggleHistory() {
+            document.getElementById('history-panel').style.display = 'block';
+            document.getElementById('admin-main-view').style.display = 'none';
+            window.scrollTo(0,0);
         }
     </script>
 </body>
