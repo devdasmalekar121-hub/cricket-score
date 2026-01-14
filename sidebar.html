@@ -3,172 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Sidebar Overlay</title>
+    <title>Master Sidebar PCR - Live Status</title>
     <link href="https://fonts.googleapis.com/css2?family=Khand:wght@500;700&family=Rozha+One&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: transparent; /* OBS में पारदर्शी दिखेगा */
-            overflow: hidden;
-            font-family: 'Khand', sans-serif;
-        }
+        body { background-color: #0f0f0f; font-family: 'Khand', sans-serif; color: white; }
 
-        /* मुख्य कंटेनर - इसे OBS में दाईं ओर सेट करें */
-        #sidebar-wrapper {
-            position: absolute;
-            top: 50px;
+        /* --- LIVE OVERLAY AREA (OBS: 1920x1080) --- */
+        #live-sidebar-display {
+            position: fixed;
+            top: 20px;
             right: 20px;
-            width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            animation: slideIn 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            width: 380px;
+            z-index: 1000;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .main-card {
+            background: linear-gradient(145deg, #2a0000, #4b0000);
+            border: 3px solid #FFD700;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            overflow: hidden;
+            animation: slideIn 1s ease-out;
         }
 
-        /* --- QR CODE SECTION --- */
-        .qr-container {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border: 2px solid #FFD700;
-            border-radius: 15px;
+        @keyframes slideIn { from { transform: translateX(450px); } to { transform: translateX(0); } }
+
+        .card-header {
+            background: #FFD700;
+            color: #4b0000;
             padding: 15px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            font-family: 'Rozha One', serif;
+            font-size: 32px;
+            font-weight: bold;
+            border-bottom: 2px solid #fff;
         }
 
-        .qr-header {
-            color: #FFD700;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-            padding-bottom: 5px;
+        .qr-section {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid rgba(255,215,0,0.3);
         }
 
         .qr-box {
-            width: 180px;
-            height: 180px;
-            background: white;
-            margin: 0 auto;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 180px; height: 180px; background: white; margin: 0 auto;
+            border-radius: 12px; padding: 10px; border: 4px solid #FFD700;
+        }
+        .qr-box img { width: 100%; height: 100%; }
+
+        /* Schedule Items */
+        .schedule-list { padding: 5px 0; }
+        .schedule-item {
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
             position: relative;
-            overflow: hidden;
+            transition: all 0.4s ease;
         }
-
-        /* यहाँ अपना QR कोड इमेज डालें */
-        .qr-box img {
-            width: 90%;
-            height: 90%;
+        
+        /* जो लाइव चल रहा है उसका स्टाइल (Dark & Glow) */
+        .schedule-item.is-live {
+            background: rgba(255, 215, 0, 0.15);
+            border-left: 8px solid #FFD700;
         }
+        
+        .item-time { color: #FFD700; font-size: 18px; font-weight: 700; }
+        .item-name { color: #fff; font-size: 26px; font-weight: 500; display: block; }
 
-        .qr-footer {
-            margin-top: 10px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        /* --- UP NEXT SCHEDULE SECTION --- */
-        .schedule-container {
-            background: linear-gradient(180deg, rgba(75, 0, 0, 0.9) 0%, rgba(20, 0, 0, 0.9) 100%);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border-left: 5px solid #FFD700;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .schedule-title {
-            background: #FFD700;
-            color: #4b0000;
-            padding: 10px;
-            font-family: 'Rozha One', serif;
-            font-size: 24px;
+        /* Live Indicator Dot */
+        .live-now-tag {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: #ff0000;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 40px;
             font-weight: bold;
-            text-align: center;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+        .is-live .live-now-tag { display: block; }
+        .is-live .item-name { color: #FFD700; font-weight: 700; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* --- CONTROL PANEL AREA --- */
+        #pcr-panel {
+            margin: 1100px auto 50px;
+            max-width: 900px;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #444;
         }
 
-        .event-list {
-            padding: 10px 0;
+        .panel-title { color: #FFD700; font-size: 26px; text-align: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .input-box { margin-bottom: 15px; }
+        label { display: block; color: #aaa; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 8px; }
+
+        .list-row { 
+            display: grid; grid-template-columns: 40px 1fr 2fr 50px; gap: 10px; 
+            margin-bottom: 10px; background: #252525; padding: 10px; border-radius: 8px;
+            align-items: center;
         }
-
-        .event-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s;
+        
+        .radio-live { width: 20px; height: 20px; cursor: pointer; }
+        .btn-add { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-update { 
+            width: 100%; padding: 20px; background: linear-gradient(#FFD700, #FF8C00); 
+            border: none; border-radius: 12px; font-size: 24px; font-weight: bold; 
+            color: #4b0000; margin-top: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-
-        .event-item:last-child { border-bottom: none; }
-
-        .event-time {
-            color: #FFD700;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .event-name {
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-
-        /* विशेष चमकता हुआ इफेक्ट */
-        .active-event {
-            background: rgba(255, 215, 0, 0.1);
-            border-left: 3px solid #fff;
-        }
-
     </style>
 </head>
 <body>
 
-    <div id="sidebar-wrapper">
-        
-        <div class="qr-container">
-            <div class="qr-header">🙏 दान / सहयोग</div>
-            <div class="qr-box">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=example" alt="QR Code">
+    <div id="live-sidebar-display">
+        <div class="main-card">
+            <div class="card-header" id="disp-title">आज का कार्यक्रम</div>
+            
+            <div class="qr-section">
+                <div class="qr-box">
+                    <img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=example" alt="QR">
+                </div>
+                <p style="margin-top: 10px; font-size: 18px; color: #FFD700;">Scan & Support</p>
             </div>
-            <div class="qr-footer">Scan & Pay</div>
-        </div>
 
-        <div class="schedule-container">
-            <div class="schedule-title">आज का कार्यक्रम</div>
-            <div class="event-list">
-                <div class="event-item">
-                    <span class="event-time">04:00 PM - 05:00 PM</span>
-                    <span class="event-name">मंगलाचरण एवं दीप प्रज्वलन</span>
+            <div class="schedule-list" id="disp-list">
                 </div>
-                <div class="event-item active-event">
-                    <span class="event-time">05:00 PM - 07:30 PM</span>
-                    <span class="event-name">श्रीमद्‍भगवत् अमृत वर्षा</span>
-                </div>
-                <div class="event-item">
-                    <span class="event-time">07:30 PM - 08:00 PM</span>
-                    <span class="event-name">आरती एवं पुष्प वर्षा</span>
-                </div>
-                <div class="event-item">
-                    <span class="event-time">08:00 PM</span>
-                    <span class="event-name">महाप्रसाद वितरण</span>
-                </div>
-            </div>
         </div>
-
     </div>
 
+    <div id="pcr-panel">
+        <div class="panel-title">🎛️ SIDEBAR MASTER CONTROL (LIVE)</div>
+        
+        <div class="input-box">
+            <label>Main Title (मुख्य शीर्षक)</label>
+            <input type="text" id="in-title" value="आज का कार्यक्रम">
+        </div>
+
+        <div class="input-box">
+            <label>UPI / QR Link</label>
+            <input type="text" id="in-qr-data" value="upi://pay?pa=YOURID@ybl">
+        </div>
+
+        <div class="list-builder">
+            <label>Schedule List (LIVE चुनने के लिए गोल बटन दबाएं)</label>
+            <div id="input-items-container">
+                <div class="list-row">
+                    <input type="radio" name="live-check" class="radio-live" checked>
+                    <input type="text" class="in-time" value="05:00 PM">
+                    <input type="text" class="in-name" value="मंगलाचरण एवं दीप प्रज्वलन">
+                    <button style="background:none; border:none; color:#ff4444; font-weight:bold; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
+                </div>
+            </div>
+            <button class="btn-add" onclick="addRow()">+ नया कार्यक्रम जोड़ें</button>
+        </div>
+
+        <button class="btn-update" onclick="applyUpdate()">🔴 APPLY LIVE CHANGES</button>
+    </div>
+
+    <script>
+        function addRow() {
+            const container = document.getElementById('input-items-container');
+            const row = document.createElement('div');
+            row.className = 'list-row';
+            row.innerHTML = `
+                <input type="radio" name="live-check" class="radio-live">
+                <input type="text" class="in-time" placeholder="Time">
+                <input type="text" class="in-name" placeholder="Name">
+                <button style="background:none; border:none; color:#ff4444; font-weight:bold; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function applyUpdate() {
+            // Update Title
+            document.getElementById('disp-title').innerText = document.getElementById('in-title').value;
+
+            // Update QR
+            const qrData = document.getElementById('in-qr-data').value;
+            document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrData)}`;
+
+            // Update List
+            const rows = document.querySelectorAll('.list-row');
+            const dispList = document.getElementById('disp-list');
+            dispList.innerHTML = '';
+
+            rows.forEach(row => {
+                const isLive = row.querySelector('.radio-live').checked;
+                const timeVal = row.querySelector('.in-time').value;
+                const nameVal = row.querySelector('.in-name').value;
+
+                if(timeVal || nameVal) {
+                    const item = document.createElement('div');
+                    item.className = `schedule-item ${isLive ? 'is-live' : ''}`;
+                    item.innerHTML = `
+                        <div class="live-now-tag">ON LIVE</div>
+                        <span class="item-time">${timeVal}</span>
+                        <span class="item-name">${nameVal}</span>
+                    `;
+                    dispList.appendChild(item);
+                }
+            });
+        }
+
+        // Initial apply
+        applyUpdate();
+    </script>
 </body>
 </html>
