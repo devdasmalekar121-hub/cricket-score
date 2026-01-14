@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Bhagwat PCR Engine</title>
+    <title>Bhagwat PCR Engine - Firebase Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Khand:wght@500;700&family=Rozha+One&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: #0a0a0a; font-family: 'Khand', sans-serif; overflow-x: hidden; color: white; }
@@ -46,8 +50,6 @@
         .breaking-active #headline-wrapper {
             background: linear-gradient(135deg, #ff0000 0%, #990000 100%);
         }
-
-        /* Note: Live Indicator dot removed as requested */
 
         .headline-top {
             height: 65%;
@@ -121,66 +123,36 @@
             padding: 30px;
             border-radius: 20px;
             border: 2px solid #333;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
         .pcr-title {
-            text-align: center;
-            font-size: 28px;
-            color: #FFD700;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            text-align: center; font-size: 28px; color: #FFD700; margin-bottom: 30px;
+            border-bottom: 2px solid #333; padding-bottom: 10px; text-transform: uppercase;
         }
 
         .preset-row {
-            display: grid;
-            grid-template-columns: 50px 1fr 1fr 2fr 150px;
-            gap: 15px;
-            background: #252525;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            align-items: center;
-            border-left: 5px solid #444;
-            transition: 0.3s;
+            display: grid; grid-template-columns: 50px 1fr 1fr 2fr 150px; gap: 15px;
+            background: #252525; padding: 15px; margin-bottom: 15px; border-radius: 10px; align-items: center;
         }
 
         .preset-row.active { border-left: 5px solid #2ecc71; background: #2a352a; }
-        .slot-num { font-size: 24px; font-weight: bold; color: #555; }
-        .preset-row.active .slot-num { color: #2ecc71; }
 
         input, textarea {
             width: 100%; padding: 10px; background: #000; border: 1px solid #444;
-            color: #fff; border-radius: 5px; font-family: sans-serif;
+            color: #fff; border-radius: 5px;
         }
 
         .btn-push {
             background: #444; color: white; border: none; padding: 10px;
             border-radius: 5px; cursor: pointer; font-weight: bold; height: 100%;
-            transition: 0.3s;
         }
         .active .btn-push { background: #2ecc71; color: #000; }
 
-        .master-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px dashed #555;
-        }
-
         .btn-breaking-toggle {
-            background: #600; color: #fff; border: 2px solid #f00;
-            padding: 15px 40px; border-radius: 10px; font-weight: bold;
-            cursor: pointer; font-size: 20px; transition: all 0.3s ease;
+            background: #600; color: #fff; border: 2px solid #f00; padding: 15px 40px;
+            border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 20px;
         }
-        .btn-breaking-toggle.on { background: #f00; box-shadow: 0 0 20px #f00; transform: scale(1.05); }
+        .btn-breaking-toggle.on { background: #f00; }
     </style>
 </head>
 <body>
@@ -190,7 +162,6 @@
             <div class="headline-top" id="display-head-top">🕉️ स्वागतम</div>
             <div class="headline-bottom" id="display-head-bottom">LIVE BROADCAST</div>
         </div>
-
         <div id="ticker-container">
             <div id="ticker-move">
                 <span id="ticker-text">श्रीमद्‍भगवत् महापुराण कथा में आप सभी का स्वागत है...</span>
@@ -199,95 +170,104 @@
     </div>
 
     <div id="control-panel">
-        <div class="pcr-title">🎛️ Bhagwat Live PCR - Master Control</div>
+        <div class="pcr-title">🎛️ Bhagwat Live PCR (Firebase Synced)</div>
         
-        <div class="preset-row active" id="row-1">
+        <div class="preset-row" id="row-1">
             <div class="slot-num">01</div>
             <div><input type="text" id="head-1-t" value="🕉️ भागवत कथा"></div>
             <div><input type="text" id="head-1-b" value="संपर्क: 9876543210"></div>
-            <div><textarea id="tick-1">प्रथम दिवस: श्रीमद्‍भगवत् महापुराण कथा का भव्य शुभारंभ... आप सभी सादर आमंत्रित हैं।</textarea></div>
-            <button class="btn-push" onclick="pushToLive(1)">SET LIVE</button>
+            <div><textarea id="tick-1">प्रथम दिवस: श्रीमद्‍भगवत् महापुराण कथा का भव्य शुभारंभ...</textarea></div>
+            <button class="btn-push" onclick="pushToFirebase(1)">SET LIVE</button>
         </div>
 
         <div class="preset-row" id="row-2">
             <div class="slot-num">02</div>
             <div><input type="text" id="head-2-t" value="🚩 विशेष सूचना"></div>
             <div><input type="text" id="head-2-b" value="समय: सायं 4 बजे"></div>
-            <div><textarea id="tick-2">कल की कथा का समय दोपहर 3 बजे से रहेगा, सभी श्रद्धालु समय का विशेष ध्यान रखें।</textarea></div>
-            <button class="btn-push" onclick="pushToLive(2)">SET LIVE</button>
+            <div><textarea id="tick-2">कल की कथा का समय दोपहर 3 बजे से रहेगा...</textarea></div>
+            <button class="btn-push" onclick="pushToFirebase(2)">SET LIVE</button>
         </div>
 
         <div class="preset-row" id="row-3">
             <div class="slot-num">03</div>
             <div><input type="text" id="head-3-t" value="🙏 दान / सहयोग"></div>
             <div><input type="text" id="head-3-b" value="PhonePe: 98765XXXX"></div>
-            <div><textarea id="tick-3">कथा आयोजन में अपना सहयोग देने हेतु दिए गए नंबर पर संपर्क करें या ऑनलाइन दान करें।</textarea></div>
-            <button class="btn-push" onclick="pushToLive(3)">SET LIVE</button>
+            <div><textarea id="tick-3">कथा आयोजन में अपना सहयोग देने हेतु संपर्क करें...</textarea></div>
+            <button class="btn-push" onclick="pushToFirebase(3)">SET LIVE</button>
         </div>
 
-        <div class="master-controls">
+        <div class="master-controls" style="display:flex; justify-content: space-between; margin-top:20px; background:#222; padding:20px; border-radius:10px;">
             <div>
                 <span>SCROLL SPEED: </span>
-                <input type="number" id="global-speed" value="25" style="width:70px; background: #000; color: #fff; padding: 5px;">
-                <span style="font-size: 12px; color: #888; margin-left: 10px;">(Sec)</span>
+                <input type="number" id="global-speed" value="25" style="width:70px;">
             </div>
-
-            <button class="btn-breaking-toggle" id="break-btn" onclick="toggleBreaking()">🚨 BREAKING NEWS MODE</button>
-            
-            <div style="text-align: right; color: #888; font-size: 13px;">
-                * <b>SET LIVE</b> से डेटा बदलें<br>
-                * <b>BREAKING</b> से रेड अलर्ट ऑन करें
-            </div>
+            <button class="btn-breaking-toggle" id="break-btn" onclick="toggleBreakingFirebase()">🚨 BREAKING NEWS MODE</button>
         </div>
     </div>
 
     <script>
-        function pushToLive(slot) {
-            const headT = document.getElementById(`head-${slot}-t`).value;
-            const headB = document.getElementById(`head-${slot}-b`).value;
-            const ticker = document.getElementById(`tick-${slot}`).value;
-            const speed = document.getElementById('global-speed').value;
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            databaseURL: "https://bhagwat-live-pcr-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
+        // --- PUSH DATA TO FIREBASE ---
+        function pushToFirebase(slot) {
+            const data = {
+                activeSlot: slot,
+                headT: document.getElementById(`head-${slot}-t`).value,
+                headB: document.getElementById(`head-${slot}-b`).value,
+                ticker: document.getElementById(`tick-${slot}`).value,
+                speed: document.getElementById('global-speed').value
+            };
+            db.ref('liveData').update(data);
+        }
+
+        function toggleBreakingFirebase() {
+            const isBreaking = !document.getElementById('live-output-container').classList.contains('breaking-active');
+            db.ref('liveData').update({ breaking: isBreaking });
+        }
+
+        // --- LISTEN FOR REAL-TIME UPDATES ---
+        db.ref('liveData').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (!val) return;
+
+            // Update Text
             const dispHeadT = document.getElementById('display-head-top');
             const dispHeadB = document.getElementById('display-head-bottom');
             const dispTicker = document.getElementById('ticker-text');
             const tickerMove = document.getElementById('ticker-move');
-
-            dispHeadT.style.opacity = 0;
-            dispHeadB.style.opacity = 0;
-            dispTicker.style.opacity = 0;
-
-            setTimeout(() => {
-                dispHeadT.innerText = headT;
-                dispHeadB.innerText = headB;
-                dispTicker.innerText = ticker;
-
-                tickerMove.style.animation = 'none';
-                tickerMove.offsetHeight; 
-                tickerMove.style.animation = `scroll-left ${speed}s linear infinite`;
-
-                dispHeadT.style.opacity = 1;
-                dispHeadB.style.opacity = 1;
-                dispTicker.style.opacity = 1;
-            }, 500);
-
-            document.querySelectorAll('.preset-row').forEach(row => row.classList.remove('active'));
-            document.getElementById(`row-${slot}`).classList.add('active');
-        }
-
-        function toggleBreaking() {
             const container = document.getElementById('live-output-container');
             const btn = document.getElementById('break-btn');
-            
-            container.classList.toggle('breaking-active');
-            btn.classList.toggle('on');
 
-            if(container.classList.contains('breaking-active')) {
+            // Set Animations and Values
+            dispHeadT.innerText = val.headT;
+            dispHeadB.innerText = val.headB;
+            dispTicker.innerText = val.ticker;
+            
+            tickerMove.style.animation = 'none';
+            tickerMove.offsetHeight; // trigger reflow
+            tickerMove.style.animation = `scroll-left ${val.speed || 25}s linear infinite`;
+
+            // Breaking Mode Logic
+            if(val.breaking) {
+                container.classList.add('breaking-active');
+                btn.classList.add('on');
                 btn.innerHTML = "🚨 MODE: BREAKING (LIVE)";
             } else {
+                container.classList.remove('breaking-active');
+                btn.classList.remove('on');
                 btn.innerHTML = "🚨 BREAKING NEWS MODE";
             }
-        }
+
+            // Update UI Active State in Panel
+            document.querySelectorAll('.preset-row').forEach(row => row.classList.remove('active'));
+            const activeRow = document.getElementById(`row-${val.activeSlot}`);
+            if(activeRow) activeRow.classList.add('active');
+        });
     </script>
 </body>
 </html>
