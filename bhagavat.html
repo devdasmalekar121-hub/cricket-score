@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhagwat Katha Live Ticker</title>
+    <style>
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-box: border-box; }
+        body { 
+            background-color: #1a1a1a; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- LIVE OUTPUT SECTION (OBS AREA) --- */
+        #live-output-container {
+            width: 1920px;
+            height: 120px;
+            background: linear-gradient(to right, #4b0000, #800000, #4b0000);
+            position: relative;
+            display: flex;
+            align-items: center;
+            border-top: 4px solid #FFD700;
+            border-bottom: 4px solid #FFD700;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* Headline Box (Left) */
+        #headline-box {
+            height: 100%;
+            min-width: 350px;
+            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FFD700 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            z-index: 10;
+            box-shadow: 10px 0 20px rgba(0,0,0,0.4);
+            border-right: 3px solid #fff;
+        }
+
+        #headline-text {
+            color: #4b0000;
+            font-size: 42px;
+            font-weight: 800;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+
+        /* Ticker Area (Right) */
+        #ticker-container {
+            flex-grow: 1;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        #ticker-move {
+            white-space: nowrap;
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 25s linear infinite;
+        }
+
+        #ticker-text {
+            color: #FFD700;
+            font-size: 46px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Decoration Elements */
+        .gold-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.3);
+        }
+        .line-top { top: 15px; }
+        .line-bottom { bottom: 15px; }
+
+        /* --- CONTROL PANEL SECTION (NOT SEEN IN OBS) --- */
+        #control-panel {
+            width: 100%;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            color: #eee;
+            border: 2px solid #444;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-transform: uppercase;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            border: 1px solid #555;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(#FFD700, #FF8C00);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4b0000;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .hint {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="live-output-container">
+        <div class="gold-line line-top"></div>
+        <div id="headline-box">
+            <span id="headline-text">🕉️ भागवत कथा</span>
+        </div>
+        <div id="ticker-container">
+            <div id="ticker-move">
+                <span id="ticker-text">श्रीमद्‍भगवत् महापुराण कथा में आप सभी श्रद्धालुओं का हार्दिक स्वागत है...</span>
+            </div>
+        </div>
+        <div class="gold-line line-bottom"></div>
+    </div>
+
+    <div id="control-panel">
+        <div class="panel-title">Operator Control Panel</div>
+        
+        <div class="input-group">
+            <label>Headline (Yellow Box)</label>
+            <input type="text" id="input-headline" value="🕉️ भागवत कथा">
+        </div>
+
+        <div class="input-group">
+            <label>Ticker Message (Scrolling Text)</label>
+            <textarea id="input-ticker">श्रीमद्‍भगवत् महापुराण कथा में आप सभी श्रद्धालुओं का हार्दिक स्वागत है... </textarea>
+        </div>
+
+        <div class="input-group" style="width: 200px;">
+            <label>Scroll Speed (Seconds)</label>
+            <input type="number" id="input-speed" value="25" min="5" max="100">
+        </div>
+
+        <button onclick="updateTicker()">GO LIVE / UPDATE</button>
+
+        <div class="hint">
+            * <b>OBS Tip:</b> Set source width to 1920. Use "Alt+Drag" in OBS to crop the view to only show the top ticker bar.
+        </div>
+    </div>
+
+    <script>
+        function updateTicker() {
+            const headlineInput = document.getElementById('input-headline').value;
+            const tickerInput = document.getElementById('input-ticker').value;
+            const speedInput = document.getElementById('input-speed').value;
+
+            const headlineDisplay = document.getElementById('headline-text');
+            const tickerDisplay = document.getElementById('ticker-text');
+            const tickerMove = document.getElementById('ticker-move');
+
+            // Update Texts
+            headlineDisplay.innerText = headlineInput;
+            tickerDisplay.innerText = tickerInput;
+
+            // Reset Animation
+            tickerMove.style.animation = 'none';
+            tickerMove.offsetHeight; // Trigger reflow
+            tickerMove.style.animation = `scroll-left ${speedInput}s linear infinite`;
+        }
+    </script>
+</body>
+</html>
